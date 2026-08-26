@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI共享平台 - 运营管理</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { --blue:#1677ff; --line:#e5e7eb; --muted:#7b8493; --bg:#f5f7fa; --text:#172033; }
+    body { margin:0; font-family:"Microsoft YaHei",Arial,sans-serif; color:var(--text); background:var(--bg); font-size:14px; }
+    button, select, input { font:inherit; }
+    button { cursor:pointer; }
+    .topbar { height:58px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 18px; position:sticky; top:0; z-index:5; }
+    .brand { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:700; white-space:nowrap; }
+    .brand-mark { width:30px; height:30px; border:3px solid #ffad33; border-radius:50% 42% 50% 40%; transform:rotate(-25deg); }
+    .crumb { margin-left:28px; padding-left:22px; border-left:1px solid var(--line); color:#697386; }
+    .top-actions { margin-left:auto; display:flex; gap:22px; align-items:center; color:#444; }
+    .badge { position:relative; }
+    .badge::after { content:"20"; position:absolute; top:-13px; right:-14px; background:#ff6b72; color:#fff; border-radius:10px; padding:1px 6px; font-size:11px; }
+    .layout { display:grid; grid-template-columns:252px minmax(0,1fr); min-height:calc(100vh - 58px); }
+    aside { background:#fff; border-right:1px solid var(--line); padding:14px 10px; }
+    .search { width:100%; height:40px; border:1px solid #d8dde6; border-radius:7px; padding:0 12px; color:#687386; }
+    nav { margin-top:16px; display:grid; gap:7px; }
+    .nav-item { height:50px; display:flex; align-items:center; gap:11px; padding:0 14px; color:#6d7686; border-radius:4px; }
+    .nav-item.active { background:var(--blue); color:#fff; }
+    .nav-icon { width:18px; text-align:center; font-size:17px; }
+    main { min-width:0; }
+    .tabbar { height:42px; background:#fff; border-bottom:1px solid var(--line); padding-left:20px; display:flex; align-items:end; }
+    .tab { color:var(--blue); border-bottom:2px solid var(--blue); padding:0 0 11px; }
+    .content { padding:22px 18px 26px; }
+    .toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+    h1 { font-size:18px; margin:0 14px 0 0; }
+    .segmented { display:flex; border:1px solid #d9dee7; border-radius:6px; overflow:hidden; background:#fff; }
+    .segmented button { border:0; border-right:1px solid #d9dee7; padding:9px 23px; background:#fff; color:#465064; }
+    .segmented button:last-child { border-right:0; }
+    .segmented button.active { background:var(--blue); color:#fff; }
+    .field { height:38px; min-width:240px; border:1px solid #d9dee7; background:#fff; border-radius:6px; padding:0 12px; color:#566174; }
+    select.field { min-width:240px; }
+    .icon-btn { width:40px; height:38px; border:1px solid #d9dee7; background:#fff; border-radius:6px; font-size:18px; }
+    .primary { margin-left:auto; border:0; border-radius:5px; background:var(--blue); color:#fff; height:40px; padding:0 18px; font-weight:600; }
+    .grid { display:grid; grid-template-columns:1.05fr 1.35fr 1.35fr; gap:14px; margin-bottom:14px; }
+    .card { background:#fff; border:1px solid #e1e5eb; border-radius:7px; min-width:0; }
+    .card h2 { font-size:18px; margin:0; }
+    .summary { grid-column:span 1; padding:22px 20px 12px; }
+    .summary.wide { grid-column:span 2; }
+    .metrics { display:grid; grid-template-columns:repeat(3,1fr); margin-top:22px; }
+    .metrics.four { grid-template-columns:repeat(4,1fr); }
+    .metric { display:flex; gap:12px; align-items:center; padding:0 16px; border-right:1px solid var(--line); min-width:0; }
+    .metric:last-child { border-right:0; }
+    .smart-action { display:flex; align-items:center; gap:12px; padding:0 16px; border:0; border-right:1px solid var(--line); background:#fff; text-align:left; min-width:0; cursor:pointer; position:relative; }
+    .smart-action:last-child { border-right:0; }
+    .smart-action:hover,.smart-action:focus-visible { background:#f5f9ff; outline:none; }
+    .smart-action:hover .label,.smart-action:focus-visible .label { color:var(--blue); }
+    .smart-action::after { content:"›"; position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#9aa4b2; font-size:18px; }
+    .smart-action .metric-icon { background:#eaf4ff; color:var(--blue); }
+    .smart-action .label,.smart-action .value { display:block; }
+    .metric-icon { width:48px; height:48px; border-radius:7px; display:grid; place-items:center; background:#eaf4ff; color:var(--blue); font-size:23px; flex:0 0 auto; }
+    .metric:nth-child(2) .metric-icon { background:#eafbf0; color:#05b96e; }
+    .metric:nth-child(3) .metric-icon { background:#fff7e8; color:#faad14; }
+    .metric:nth-child(4) .metric-icon { background:#fff0f1; color:#ff4d5a; }
+    .label { color:#687386; margin-bottom:2px; white-space:nowrap; }
+    .value { font-size:28px; font-weight:700; line-height:1.1; }
+    .value small { font-size:14px; margin-left:4px; }
+    .terminal-card { padding:20px; margin-bottom:14px; }
+    .card-title-row { display:flex; align-items:center; justify-content:space-between; }
+    .hint { color:#8a93a3; font-size:13px; }
+    .link-hint { border:0; background:transparent; padding:4px 0; color:var(--blue); cursor:pointer; }
+    .link-hint:hover { text-decoration:underline; }
+    .terminal-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); margin-top:18px; }
+    .terminal { position:relative; display:flex; align-items:center; gap:8px; padding:12px; border:0; border-right:1px solid var(--line); background:#fff; text-align:left; min-width:0; }
+    .terminal:last-child { border-right:0; }
+    .terminal:hover { background:#f7fbff; }
+    .terminal.active { background:#f0f7ff; box-shadow:inset 0 -3px var(--blue); }
+    .device { width:44px; height:44px; border:0; border-radius:9px; color:var(--blue); background:#eaf4ff; display:grid; place-items:center; font-size:12px; font-weight:700; flex:0 0 auto; }
+    .terminal:nth-child(2) .device { color:#27ae60; border-radius:15px 15px 8px 8px; }
+    .terminal:nth-child(3) .device { color:#e59000; border-radius:50%; }
+    .terminal:nth-child(4) .device { color:#6f52d9; border-radius:4px; }
+    .terminal:nth-child(5) .device { color:#e34d59; border-radius:6px; }
+    .terminal-main { display:block; min-width:0; flex:1; }
+    .terminal-line { display:flex; align-items:baseline; gap:4px; color:#5f6b7c; white-space:nowrap; }
+    .terminal-name { color:#536072; font-size:14px; }
+    .terminal-value { color:#172033; font-size:21px; font-weight:700; }
+    .terminal-value small { font-size:12px; margin-left:2px; font-weight:400; color:#697386; }
+    .terminal-share { color:#697386; font-size:12px; }
+    .terminal-progress { display:block; height:10px; margin-top:8px; border-radius:6px; overflow:hidden; background:#e8f2ff; }
+    .terminal-progress i { display:block; min-width:2px; height:100%; border-radius:6px; background:var(--blue); }
+    .business { padding:22px 20px; min-height:164px; }
+    .business .metrics { margin-top:26px; grid-template-columns:repeat(2,1fr); }
+    .business .metric { padding-left:16px; }
+    .im-action { min-height:72px; padding:0 16px; border:0; border-right:1px solid var(--line); background:#fff; text-align:left; cursor:pointer; position:relative; }
+    .im-action:last-child { border-right:0; }
+    .im-action:hover,.im-action:focus-visible { background:#f5f9ff; outline:none; }
+    .im-action:hover .label,.im-action:focus-visible .label { color:var(--blue); }
+    .im-action::after { content:"›"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#9aa4b2; font-size:20px; }
+    .im-action .label,.im-action .value { display:block; }
+    .im-action .value { margin-top:4px; }
+    .business.ai-card { min-height:204px; padding:24px 22px; }
+    .business.ai-card { cursor:pointer; transition:border-color .18s,box-shadow .18s,transform .18s; }
+    .business.ai-card:hover,.business.ai-card:focus-visible { border-color:var(--blue); box-shadow:0 4px 14px #1677ff24; transform:translateY(-1px); outline:none; }
+    .business.ai-card.featured { border-color:var(--blue); box-shadow:0 2px 8px #1677ff1a; }
+    .business.ai-card .metrics { grid-template-columns:.72fr 1.25fr .78fr 1fr; margin-top:28px; }
+    .business.ai-card .metric { padding:0 18px; min-height:62px; align-items:flex-start; }
+    .business.ai-card .metric:first-child { padding-left:4px; }
+    .business.ai-card .metric:last-child { padding-right:0; }
+    .business.ai-card .label { font-size:15px; }
+    .business.ai-card .value { margin-top:2px; font-size:30px; white-space:nowrap; }
+    .service-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:14px; }
+    .service-card { min-height:178px; padding:22px; cursor:pointer; transition:border-color .18s,box-shadow .18s,transform .18s; }
+    .service-card:hover,.service-card:focus-visible { border-color:var(--blue); box-shadow:0 4px 14px #1677ff24; transform:translateY(-1px); outline:none; }
+    .service-card-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .service-card-head .more { color:var(--blue); font-size:13px; }
+    .service-metrics { display:grid; grid-template-columns:repeat(3,1fr); margin-top:28px; }
+    .service-metric { padding:0 18px; border-right:1px solid var(--line); min-width:0; }
+    .service-metric:first-child { padding-left:0; }
+    .service-metric:last-child { border-right:0; }
+    .service-metric .value { margin-top:5px; font-size:28px; }
+    .progress { width:145px; max-width:100%; height:14px; border-radius:7px; background:#e8f2ff; overflow:hidden; margin-top:10px; }
+    .progress span { display:block; height:100%; background:var(--blue); border-radius:7px; }
+    .lower { display:grid; grid-template-columns:minmax(340px,1.5fr) minmax(230px,1fr) minmax(600px,3fr); gap:14px; align-items:stretch; }
+    .feedback, .chart { padding:20px; min-height:430px; overflow:hidden; }
+    .resource-stats { display:grid; grid-template-rows:repeat(3,1fr); gap:14px; min-width:0; }
+    .resource-stat { padding:20px 18px; display:flex; align-items:center; gap:14px; position:relative; overflow:hidden; }
+    .resource-stat::after { content:""; position:absolute; right:0; top:34%; width:4px; height:32%; border-radius:3px 0 0 3px; background:#6657ef; }
+    .resource-stat:nth-child(2)::after { background:#1677ff; }
+    .resource-stat:nth-child(3)::after { background:#16b979; }
+    .resource-icon { width:48px; height:48px; border-radius:7px; flex:0 0 auto; display:grid; place-items:center; background:#f0edff; color:#6657ef; font-size:23px; font-weight:700; }
+    .resource-stat:nth-child(2) .resource-icon { background:#eaf4ff; color:#1677ff; }
+    .resource-stat:nth-child(3) .resource-icon { background:#eafbf0; color:#16a56a; }
+    .resource-label { color:#697386; font-size:15px; margin-bottom:5px; white-space:nowrap; }
+    .resource-value { font-size:28px; font-weight:700; white-space:nowrap; }
+    .resource-value small { font-size:13px; margin-left:5px; color:#697386; font-weight:400; }
+    .panel-subtitle { color:#8a94a3; font-size:13px; margin-top:3px; }
+    .feedback-overview { display:grid; grid-template-columns:1fr 150px 1fr; align-items:center; gap:12px; padding:18px 6px 16px; }
+    .feedback-legend { display:flex; align-items:center; gap:10px; color:#596575; }
+    .feedback-legend.right { justify-content:flex-end; }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; background:#2f88f7; }
+    .legend-dot.negative { background:#f0a12b; }
+    .feedback-name { font-size:14px; }
+    .feedback-number { font-size:22px; line-height:1.2; color:#1677ff; font-weight:700; }
+    .feedback-number.negative { color:#e99116; }
+    .donut { width:128px; height:128px; margin:auto; border-radius:50%; background:conic-gradient(#1677ff 0 66.667%,#f5a623 66.667%); position:relative; box-shadow:inset 0 0 0 1px #fff; }
+    .donut::after { content:"3\A 数量"; white-space:pre; position:absolute; inset:13px; border-radius:50%; background:#fff; display:grid; place-items:center; text-align:center; color:#687386; font-size:13px; font-weight:400; line-height:1.8; }
+    .donut::before { content:"3"; position:absolute; z-index:1; left:0; right:0; top:35px; text-align:center; color:#1f2633; font-size:26px; font-weight:700; }
+    .score-list { border-top:1px solid #edf0f4; padding-top:14px; display:grid; gap:12px; }
+    .score-head,.score-row { display:grid; grid-template-columns:88px minmax(100px,1fr) 34px; gap:12px; align-items:center; }
+    .score-head { color:#8a94a3; font-size:13px; }
+    .score-row { color:#3d4655; }
+    .score-track { height:9px; border-radius:5px; background:#eef0f3; overflow:hidden; }
+    .score-fill { display:block; height:100%; border-radius:5px; background:#1677ff; }
+    .score-fill.negative { background:#ff8a1c; }
+    .score-count { text-align:right; font-weight:600; }
+    .chart-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+    .chart-legend { display:flex; align-items:center; gap:20px; color:#596575; white-space:nowrap; font-size:13px; padding-top:4px; }
+    .legend-bar { width:24px; height:10px; border-radius:2px; background:#247cf0; }
+    .legend-bar.api { background:#ff851b; }
+    .legend-line { width:24px; height:3px; background:#4f36e8; position:relative; }
+    .legend-line::after { content:""; position:absolute; right:-1px; top:50%; width:8px; height:8px; border-radius:50%; background:#4f36e8; border:2px solid #fff; transform:translateY(-50%); box-shadow:0 0 0 1px #4f36e8; }
+    .chart-area { height:350px; margin-top:14px; position:relative; }
+    .chart-area svg { width:100%; height:100%; display:block; overflow:visible; }
+    .chart-grid { stroke:#e7ebf0; stroke-width:1; stroke-dasharray:4 4; }
+    .chart-axis-label { fill:#7a8594; font-size:11px; }
+    .chart-bar-agent { fill:#247cf0; }
+    .chart-bar-api { fill:#ff851b; }
+    .chart-line { fill:none; stroke:#4f36e8; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; }
+    .chart-point { fill:#4f36e8; stroke:#fff; stroke-width:2; cursor:pointer; }
+    .chart-hit { fill:transparent; cursor:pointer; }
+    .chart-tooltip { position:absolute; display:none; pointer-events:none; min-width:138px; padding:9px 11px; border-radius:5px; background:#fff; border:1px solid #dfe4eb; box-shadow:0 6px 20px #1f263326; color:#3d4655; font-size:12px; line-height:1.8; z-index:2; }
+    .chart-tooltip.show { display:block; }
+    .toast { position:fixed; top:74px; left:50%; transform:translateX(-50%); background:#fff; border:1px solid #dfe5ec; box-shadow:0 5px 18px #0002; padding:11px 18px; border-radius:6px; opacity:0; pointer-events:none; transition:.2s; z-index:10; }
+    .toast.show { opacity:1; }
+    .loading .card { opacity:.55; }
+    .detail-page { display:none; padding:0; background:#fff; min-height:calc(100vh - 100px); }
+    .detail-page.show { display:block; }
+    .dashboard-page.hide { display:none; }
+    .detail-head { height:62px; padding:0 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px; font-size:17px; font-weight:600; }
+    .back-link { border:0; background:transparent; color:var(--blue); padding:0; font-size:17px; }
+    .detail-body { padding:22px 28px 28px; }
+    .detail-tools { display:flex; justify-content:flex-end; align-items:center; gap:18px; margin-bottom:18px; flex-wrap:wrap; }
+    .filters { display:flex; gap:10px; flex:1; justify-content:flex-end; min-width:0; }
+    .filters .field { min-width:180px; }
+    .filters .search-field { min-width:260px; }
+    #detailDates { min-width:220px; }
+    .table-wrap { overflow:auto; border:1px solid #edf0f4; border-width:0 0 1px; }
+    .data-table { width:100%; border-collapse:collapse; min-width:1320px; table-layout:fixed; }
+    .data-table th { height:58px; padding:0 16px; text-align:left; background:#f4f6f9; font-size:15px; white-space:nowrap; }
+    .data-table td { height:62px; padding:0 16px; border-bottom:1px solid #eef0f3; color:#3d4655; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .data-table tbody tr:nth-child(even) { background:#f7f9fc; }
+    .data-table tbody tr:hover { background:#eef6ff; }
+    .terminal-tag { display:inline-block; min-width:48px; padding:3px 8px; border:1px solid #91caff; border-radius:4px; color:#1677ff; text-align:center; background:#eaf4ff; }
+    .status-ok { color:#16a56a; }
+    .empty-row td { height:260px; text-align:center; color:#8b94a3; }
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:9px; padding-top:18px; color:#6f7785; }
+    .pagination button { min-width:38px; height:38px; border:1px solid #e0e5ec; background:#f4f6f9; border-radius:4px; color:#333b49; }
+    .pagination button.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+    .pagination button:disabled { opacity:.45; cursor:not-allowed; }
+    .page-size { min-width:100px!important; width:100px; }
+    .app-detail-body { padding:22px 28px 32px; }
+    .app-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+    .org-level-switch { position:relative; margin-left:auto; }
+    .org-level-trigger { width:250px; height:40px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; border:1px solid #cfd7e3; border-radius:5px; background:#fff; color:#3e4858; font-size:14px; }
+    .org-level-trigger:hover,.org-level-trigger[aria-expanded="true"] { border-color:#4096ff; box-shadow:0 0 0 2px rgba(22,119,255,.08); }
+    .org-level-trigger .chevron { color:#8b94a3; transition:transform .18s; }
+    .org-level-trigger[aria-expanded="true"] .chevron { transform:rotate(180deg); }
+    .org-level-menu { position:absolute; z-index:20; top:46px; left:0; width:520px; display:none; grid-template-columns:220px 1fr; border:1px solid #dfe4ec; border-radius:5px; background:#fff; box-shadow:0 8px 24px rgba(31,45,61,.14); overflow:hidden; }
+    .org-level-menu.show { display:grid; }
+    .org-level-column { min-height:250px; padding:10px 0; }
+    .org-level-column + .org-level-column { border-left:1px solid #e8ebf0; }
+    .org-level-option { width:100%; min-height:44px; padding:0 16px; display:flex; align-items:center; gap:10px; border:0; background:#fff; color:#4e5969; text-align:left; }
+    .org-level-option:hover { background:#f5f9ff; }
+    .org-level-option.active { color:#1677ff; font-weight:600; background:#f0f7ff; }
+    .org-level-option .radio { width:16px; height:16px; border:1px solid #d6dce5; border-radius:50%; flex:0 0 auto; }
+    .org-level-option.active .radio { border:5px solid #4096ff; }
+    .org-level-option .next { margin-left:auto; color:#8b94a3; font-size:20px; }
+    .app-tabs { display:flex; border-bottom:1px solid var(--line); margin-bottom:18px; }
+    .app-tab { height:42px; padding:0 20px; border:0; border-bottom:2px solid transparent; background:#fff; color:#596575; }
+    .app-tab.active { color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
+    .app-filters { margin-left:auto; display:flex; gap:10px; }
+    .org-level-switch + .app-filters { margin-left:0; }
+    .app-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+    .app-summary.hide { display:none; }
+    .app-stat { border:1px solid var(--line); background:#fff; border-radius:6px; padding:16px 18px; }
+    .app-stat-label { color:#687386; margin-bottom:6px; }
+    .app-stat-value { font-size:27px; font-weight:700; }
+    .app-stat:nth-child(2) .app-stat-value { color:#1677ff; }
+    .app-stat:nth-child(3) .app-stat-value { color:#08a66c; }
+    .app-stat:nth-child(4) .app-stat-value { color:#d48806; }
+    .app-panel { border:1px solid var(--line); background:#fff; border-radius:7px; overflow:hidden; }
+    .app-panel-head { height:54px; padding:0 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line); font-size:16px; font-weight:600; }
+    .app-panel-head .hint { margin-left:auto; }
+    .app-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    .app-table th { height:48px; padding:0 14px; background:#f4f6f9; text-align:left; white-space:nowrap; }
+    .app-table td { height:54px; padding:0 14px; border-top:1px solid #edf0f4; color:#3e4858; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .app-table tbody tr:hover { background:#f7fbff; }
+    .app-link { border:0; background:transparent; color:var(--blue); padding:4px; }
+    .app-link:disabled { color:#b8c0cc; cursor:not-allowed; text-decoration:none; }
+    .app-actions { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+    .app-back-org { border:0; background:transparent; color:var(--blue); padding:0; }
+    .status-tag { display:inline-block; padding:2px 8px; border-radius:4px; background:#eaf4ff; color:#1677ff; }
+    .status-tag.approved { background:#eafbf0; color:#07965f; }
+    .status-tag.rejected { background:#fff1f0; color:#cf3f3f; }
+    .direct-person-note { margin-left:6px; color:#d46b08; font-size:12px; }
+    .app-empty { height:220px!important; text-align:center; color:#8b94a3!important; }
+    .app-record-view { display:none; }
+    .app-record-view.show { display:block; }
+    .app-org-view.hide { display:none; }
+    @media (max-width:1200px) { .layout{grid-template-columns:200px 1fr}.grid{grid-template-columns:1fr 1fr}.summary.wide{grid-column:span 1}.terminal-grid{grid-template-columns:repeat(2,1fr)}.terminal:nth-child(even){border-right:0}.terminal:nth-child(-n+4){border-bottom:1px solid var(--line)}.service-grid{grid-template-columns:1fr 1fr}.lower{grid-template-columns:1fr}.primary{margin-left:0}.app-summary{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:760px) { .layout{display:block} aside{display:none}.crumb,.top-actions span:not(:last-child){display:none}.content{padding:14px}.grid{grid-template-columns:1fr}.metrics,.metrics.four{grid-template-columns:1fr}.metric{border-right:0;border-bottom:1px solid var(--line);padding:12px 4px}.terminal-grid{grid-template-columns:1fr}.terminal{border-right:0;border-bottom:1px solid var(--line)!important}.field,select.field{width:100%;min-width:0}.segmented{width:100%}.segmented button{flex:1;padding:9px}.service-grid{grid-template-columns:1fr}.service-metrics{grid-template-columns:1fr}.service-metric{border-right:0;border-bottom:1px solid var(--line);padding:12px 0}.lower{grid-template-columns:1fr}.feedback-overview{grid-template-columns:1fr 118px 1fr}.donut{width:108px;height:108px}.donut::before{top:27px}.chart-head{display:block}.chart-legend{margin-top:10px}.chart-area{height:250px}.detail-body,.app-detail-body{padding:16px}.filters{display:grid;grid-template-columns:1fr;width:100%}.filters .field,.filters .search-field{min-width:0}.pagination{justify-content:flex-start;overflow:auto}.app-summary{grid-template-columns:1fr 1fr}.org-level-switch{width:100%;margin-left:0}.org-level-trigger{width:100%}.org-level-menu{width:100%;grid-template-columns:42% 58%}.app-filters{display:grid;grid-template-columns:1fr;width:100%;margin-left:0}.app-panel{overflow:auto}.app-table{min-width:860px} }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast">数据已刷新</div>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark"></span>AI共享平台(内测)</div>
+    <div class="crumb">运营管理</div>
+    <div class="top-actions"><span>⛶</span><span class="badge">通知</span><span>星网⌄</span><span>系统管理员</span></div>
+  </header>
+  <div class="layout">
+    <aside>
+      <input class="search" placeholder="搜索菜单" aria-label="搜索菜单">
+      <nav>
+        <div class="nav-item active"><span class="nav-icon">▣</span>运营管理</div>
+        <div class="nav-item"><span class="nav-icon">▤</span>模型中心</div><div class="nav-item"><span class="nav-icon">◉</span>数据集管理</div>
+        <div class="nav-item"><span class="nav-icon">▦</span>模型训练</div><div class="nav-item"><span class="nav-icon">▥</span>知识库</div>
+        <div class="nav-item"><span class="nav-icon">▣</span>文件管理</div><div class="nav-item"><span class="nav-icon">▦</span>应用中心</div>
+        <div class="nav-item"><span class="nav-icon">⌂</span>资源与运维监控</div><div class="nav-item"><span class="nav-icon">☷</span>规则与模板配置</div>
+        <div class="nav-item"><span class="nav-icon">◇</span>智能体与应用业务</div><div class="nav-item"><span class="nav-icon">♙</span>用户与组织管理</div>
+      </nav>
+    </aside>
+    <main>
+      <div class="tabbar"><span class="tab">运营管理</span></div>
+      <section class="content dashboard-page" id="content">
+        <div class="toolbar">
+          <h1>运营管理</h1>
+          <div class="segmented" id="range"><button>近一周</button><button class="active">近一月</button><button>近一年</button></div>
+          <input class="field" id="dates" value="2026-06-14  至  2026-07-13" aria-label="日期范围">
+          <select class="field" id="org" aria-label="组织"><option>广新集团</option><option>广新控股</option><option>全部组织</option></select>
+          <button class="icon-btn" id="refresh" title="刷新数据" aria-label="刷新数据">↻</button>
+          <button class="primary" id="export">⇩&nbsp; 导出数据</button>
+        </div>
+        <div class="grid">
+          <div class="card summary"><h2>用户与流量</h2><div class="metrics">
+            <div class="metric"><span class="metric-icon">♙</span><div><div class="label">登录人数</div><div class="value" data-k="login">128</div></div></div>
+            <div class="metric"><span class="metric-icon">↟</span><div><div class="label">访问次数</div><div class="value">909</div></div></div>
+             <div class="metric"><span class="metric-icon">☆</span><div><div class="label">活跃用户数</div><div class="value">67</div></div></div>
+           </div>
+          </div>
+          <div class="card summary wide"><h2>智能体使用情况</h2><div class="metrics four">
+            <button class="smart-action" data-service="agentClick" aria-label="查看智能体点击统计"><span class="metric-icon">✺</span><span><span class="label">智能体点击数</span><span class="value">151</span></span></button>
+            <div class="metric"><span class="metric-icon">◷</span><div><div class="label">智能体响应时长</div><div class="value">11<small>秒</small></div></div></div>
+            <button class="smart-action" data-service="toolClick" aria-label="查看工具点击统计"><span class="metric-icon">⌕</span><span><span class="label">工具点击数</span><span class="value">155</span></span></button>
+            <button class="smart-action" data-service="qaCount" aria-label="查看对话问答统计"><span class="metric-icon">▣</span><span><span class="label">对话/问答次数</span><span class="value">193</span></span></button>
+           </div>
+         </div>
+        </div>
+
+        <div class="card terminal-card">
+          <div class="card-title-row"><h2>登录终端统计</h2><button class="hint link-hint" id="terminalHint" title="查看登录记录明细">登录次数合计 <b>1369</b> 次 ></button></div>
+          <div class="terminal-grid" id="terminals"></div>
+        </div>
+
+        <div class="grid">
+          <div class="card business"><h2>IM</h2><div class="metrics"><button class="im-action" data-service="imSession" aria-label="查看发起会话次数统计"><span class="label">发起会话次数</span><span class="value">27</span></button><button class="im-action" data-service="imActive" aria-label="查看用户活跃度统计"><span class="label">用户活跃度</span><span class="value">4</span></button></div></div>
+          <div class="card business ai-card featured" data-service="aiEmployee" role="button" tabindex="0" aria-label="查看AI+员工服务申请统计"><h2>AI+ 员工服务</h2><div class="metrics"><div class="metric"><div><div class="label">点击数</div><div class="value">181</div></div></div><div class="metric"><div><div class="label">提单成功率</div><div class="value">0<small>%</small></div><div class="progress"><span style="width:0%"></span></div></div></div><div class="metric"><div><div class="label">成功数</div><div class="value">0</div></div></div><div class="metric"><div><div class="label">平均时长</div><div class="value">0<small>秒</small></div></div></div></div></div>
+          <div class="card business ai-card" data-service="travel" role="button" tabindex="0" aria-label="查看AI+自动化差旅申请统计"><h2>AI+ 自动化差旅</h2><div class="metrics"><div class="metric"><div><div class="label">点击数</div><div class="value">385</div></div></div><div class="metric"><div><div class="label">提单成功率</div><div class="value">70<small>%</small></div><div class="progress"><span style="width:70%"></span></div></div></div><div class="metric"><div><div class="label">成功数</div><div class="value">28</div></div></div><div class="metric"><div><div class="label">平均时长</div><div class="value">1<small>分</small>32<small>秒</small></div></div></div></div></div>
+        </div>
+        <div class="service-grid">
+          <div class="card service-card" data-service="employeePortal" role="button" tabindex="0" aria-label="查看员工服务点击统计"><div class="service-card-head"><h2>员工服务</h2><span class="more">查看统计 ›</span></div><div class="service-metrics"><div class="service-metric"><div class="label">点击总数</div><div class="value" data-service-total="employeePortal">0</div></div><div class="service-metric"><div class="label">服务表单</div><div class="value">6<small>个</small></div></div><div class="service-metric"><div class="label">点击人数</div><div class="value" data-service-users="employeePortal">0</div></div></div></div>
+          <div class="card service-card" data-service="business" role="button" tabindex="0" aria-label="查看业务系统点击统计"><div class="service-card-head"><h2>业务系统</h2><span class="more">查看统计 ›</span></div><div class="service-metrics"><div class="service-metric"><div class="label">点击总数</div><div class="value" data-service-total="business">0</div></div><div class="service-metric"><div class="label">业务系统</div><div class="value">4<small>个</small></div></div><div class="service-metric"><div class="label">点击人数</div><div class="value" data-service-users="business">0</div></div></div></div>
+        </div>
+        <div class="lower">
+          <div class="card feedback">
+            <h2>使用反馈</h2><div class="panel-subtitle">用户评价与反馈分布</div>
+            <div class="feedback-overview">
+              <div class="feedback-legend"><span class="legend-dot"></span><div><div class="feedback-name">点赞数</div><div class="feedback-number">2</div></div></div>
+              <div class="donut" aria-label="反馈总量3条，点赞2条，点踩1条"></div>
+              <div class="feedback-legend right"><span class="legend-dot negative"></span><div><div class="feedback-name">点踩数</div><div class="feedback-number negative">1</div></div></div>
+            </div>
+            <div class="score-list">
+              <div class="score-head"><span>分数</span><span></span><span>数量</span></div>
+              <div class="score-row"><span>61-100分</span><div class="score-track"><span class="score-fill" style="width:100%"></span></div><span class="score-count">2</span></div>
+              <div class="score-row"><span>41-60分</span><div class="score-track"><span class="score-fill" style="width:0%"></span></div><span class="score-count">0</span></div>
+              <div class="score-row"><span>21-40分</span><div class="score-track"><span class="score-fill negative" style="width:50%"></span></div><span class="score-count">1</span></div>
+              <div class="score-row"><span>0-20分</span><div class="score-track"><span class="score-fill negative" style="width:0%"></span></div><span class="score-count">0</span></div>
+            </div>
+          </div>
+          <div class="resource-stats">
+            <div class="card resource-stat"><span class="resource-icon">◎</span><div><div class="resource-label">Token 总用量</div><div class="resource-value">7.19 <small>万 万Token</small></div></div></div>
+            <div class="card resource-stat"><span class="resource-icon">◇</span><div><div class="resource-label">模型总数</div><div class="resource-value">62<small>个</small></div></div></div>
+            <div class="card resource-stat"><span class="resource-icon">✣</span><div><div class="resource-label">智能体总数</div><div class="resource-value">91<small>个</small></div></div></div>
+          </div>
+          <div class="card chart">
+            <div class="chart-head"><div><h2 id="chartTitle">系统与性能</h2><div class="panel-subtitle">近30日资源消耗趋势</div></div><div class="chart-legend"><span class="legend-bar"></span><span>智能体</span><span class="legend-bar api"></span><span>API调用</span><span class="legend-line"></span><span>人均消耗</span></div></div>
+            <div class="chart-area" id="chart"><div class="chart-tooltip" id="chartTooltip"></div></div>
+          </div>
+        </div>
+      </section>
+      <section class="detail-page" id="detailPage">
+        <div class="detail-head"><button class="back-link" id="backDashboard">运营管理</button><span>›</span><span id="detailTitle">登录终端统计</span></div>
+        <div class="app-detail-body">
+          <div class="app-tabs"><button class="app-tab active" data-login-view="org">组织机构统计</button><button class="app-tab" data-login-view="records">登录明细</button></div>
+          <div class="app-toolbar">
+            <strong id="loginSubtitle">按组织机构统计不同终端登录次数</strong>
+            <div class="org-level-switch" id="loginOrgLevelSwitch">
+              <button class="org-level-trigger" id="loginOrgLevelTrigger" aria-haspopup="true" aria-expanded="false"><span id="loginOrgLevelLabel">广新集团</span><span class="chevron">⌃</span></button>
+              <div class="org-level-menu" id="loginOrgLevelMenu">
+                <div class="org-level-column"><button class="org-level-option active" id="loginOrgRoot"><span class="radio"></span><span>广新集团</span><span class="next">›</span></button></div>
+                <div class="org-level-column" id="loginOrgLevelChildren"></div>
+              </div>
+            </div>
+            <button class="icon-btn" id="loginRefresh" title="刷新登录统计" aria-label="刷新登录统计">↻</button>
+          </div>
+          <div class="app-summary" id="loginSummary"></div>
+          <div class="app-org-view" id="loginOrgView">
+            <div class="app-panel"><div class="app-panel-head"><span class="hint" id="loginOrgStatHint"></span></div><table class="app-table"><thead><tr><th style="width:150px">所属企业</th><th style="width:190px">所属部门</th><th>iOS</th><th>安卓</th><th>鸿蒙</th><th>Web</th><th>Windows</th><th>macOS</th><th style="width:90px">登录总数</th><th style="width:300px">操作</th></tr></thead><tbody id="loginOrgRows"></tbody></table></div>
+          </div>
+          <div class="app-record-view" id="loginRecordView">
+            <div class="detail-tools"><button class="app-back-org" id="backLoginOrg">‹ 返回组织统计</button><div class="filters"><input class="field search-field" id="detailSearch" placeholder="搜索访问编号、用户名或 IP" aria-label="搜索明细"><select class="field" id="detailOrg" aria-label="所属企业"><option value="">全部企业</option><option>AI项目组</option><option>集团总部</option><option>香港投资</option><option>国义招标</option><option>广新研究院</option></select><select class="field" id="detailTerminal" aria-label="终端类型"><option value="">全部终端</option><option>iOS</option><option>安卓</option><option>鸿蒙</option><option>Web</option><option>Windows</option><option>macOS</option></select><input class="field" id="detailDates" value="2026-06-14  至  2026-07-13" aria-label="日期范围"></div></div>
+            <div class="table-wrap"><table class="data-table"><thead><tr><th style="width:70px">序号</th><th style="width:110px">访问编号</th><th style="width:140px">用户名</th><th style="width:170px">所属企业</th><th style="width:190px">所属部门</th><th style="width:110px">终端类型</th><th style="width:145px">地址</th><th style="width:90px">状态</th><th style="width:120px">描述</th><th style="width:180px">访问时间</th></tr></thead><tbody id="detailRows"></tbody></table></div>
+            <div class="pagination"><span id="detailTotal">共 0 条</span><select class="field page-size" id="pageSize"><option value="10">10条/页</option><option value="20">20条/页</option></select><button id="pagePrev" aria-label="上一页">‹</button><span id="pageNumbers"></span><button id="pageNext" aria-label="下一页">›</button></div>
+          </div>
+        </div>
+      </section>
+      <section class="detail-page" id="applicationPage">
+        <div class="detail-head"><button class="back-link" id="backApplication">运营管理</button><span>›</span><span id="applicationTitle">员工服务点击统计</span></div>
+        <div class="app-detail-body">
+          <div class="app-tabs"><button class="app-tab active" data-app-view="org">组织机构统计</button><button class="app-tab" id="recordTab" data-app-view="records">点击明细</button></div>
+          <div class="app-toolbar">
+            <strong id="applicationSubtitle">按组织机构统计不同表单点击总数</strong>
+            <div class="org-level-switch" id="orgLevelSwitch">
+              <button class="org-level-trigger" id="orgLevelTrigger" aria-haspopup="true" aria-expanded="false"><span id="orgLevelLabel">广新集团</span><span class="chevron">⌃</span></button>
+              <div class="org-level-menu" id="orgLevelMenu">
+                <div class="org-level-column"><button class="org-level-option active" data-org-level="root"><span class="radio"></span><span>广新集团</span><span class="next">›</span></button></div>
+                <div class="org-level-column" id="orgLevelChildren"></div>
+              </div>
+            </div>
+            <div class="app-filters"><input class="field" id="appSearch" placeholder="搜索组织或点击人" aria-label="搜索点击记录"><select class="field" id="appType" aria-label="点击对象"></select><button class="icon-btn" id="appRefresh" title="刷新统计" aria-label="刷新统计">↻</button></div>
+          </div>
+          <div class="app-summary" id="appSummary"></div>
+          <div class="app-org-view" id="appOrgView">
+            <div class="app-panel"><div class="app-panel-head"><span class="hint" id="orgStatHint"></span></div><table class="app-table"><thead><tr id="appOrgHead"></tr></thead><tbody id="appOrgRows"></tbody></table></div>
+          </div>
+          <div class="app-record-view" id="appRecordView">
+            <div class="app-panel"><div class="app-panel-head"><button class="app-back-org" id="backOrgStats">‹ 返回组织统计</button><span id="recordPanelTitle">全部点击明细</span><span class="hint" id="recordStatHint"></span></div><table class="app-table"><thead><tr id="appRecordHead"></tr></thead><tbody id="appRecordRows"></tbody></table></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const datasets = {
+      '近一周': [18, 10, 7, 250, 37, 0],
+      '近一月': [77, 43, 32, 1058, 158, 1],
+      '近一年': [924, 516, 384, 12696, 1896, 12]
+    };
+    const terminalNames = ['iOS', '安卓', '鸿蒙', 'Web', 'Windows', 'macOS'];
+    const baseUsers = [
+      ['张三','AI项目组','星网','192.0.2.11'],['李四','AI项目组','星网','192.0.2.12'],
+      ['王五','集团总部','数智管理部','192.0.2.13'],['赵六','AI项目组','星网','192.0.2.14'],
+      ['钱七','香港投资','运营管理部','192.0.2.15'],['孙八','国义招标','信息中心','192.0.2.16'],
+      ['周九','广新研究院','数字与人工智能部','192.0.2.17'],['吴十','集团总部','资本投资中心','192.0.2.18'],
+      ['郑十一','国义招标','信息中心','192.0.2.19'],['冯十二','集团总部','财务管理部','192.0.2.20'],
+      ['陈十三','集团总部','财务资金部','192.0.2.21'],['褚十四','广新研究院','本级（直属人员）','192.0.2.22']
+    ];
+    const mockLoginRecords = Array.from({length:1369}, (_,i) => {
+      const user = baseUsers[i % baseUsers.length];
+      const terminal = i < 77 ? 'iOS' : i < 120 ? '安卓' : i < 152 ? '鸿蒙' : i < 1210 ? 'Web' : i < 1368 ? 'Windows' : 'macOS';
+      const hour = String(17 - (i % 9)).padStart(2,'0');
+      const minute = String((14 + i * 7) % 60).padStart(2,'0');
+      const second = String((36 + i * 11) % 60).padStart(2,'0');
+      return { id:174187-i*31, name:user[0], org:user[1], dept:user[2], terminal, ip:user[3], status:'成功', desc:'登录成功', time:`2026-07-${String(13-Math.floor(i/42)).padStart(2,'0')} ${hour}:${minute}:${second}` };
+    });
+    const applicationConfigs = {
+      agentClick: { title:'智能体点击数', detailTitle:'智能体点击数统计', prefix:'ZNT', count:151, mode:'click', orgOnly:true, objectLabel:'智能体名称', orgSubtitle:'按机构统计不同智能体点击数，可查看上下级机构', types:['广新智能助手','AI+财务自动差旅','智能问答','法智小新','智能摘要','智能数据'], terms:{ action:'点击', total:'智能体点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
+      toolClick: { title:'工具点击数', detailTitle:'工具点击数统计', prefix:'GJ', count:155, mode:'click', orgOnly:true, objectLabel:'工具名称', orgSubtitle:'按机构统计不同工具点击数，可查看上下级机构', types:['知识库检索','文件解析','数据查询','表单生成'], terms:{ action:'点击', total:'工具点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
+      qaCount: { title:'对话/问答次数', detailTitle:'对话/问答次数统计', prefix:'WD', count:193, mode:'click', orgOnly:true, objectLabel:'问答场景', orgSubtitle:'按机构统计不同问答场景次数，可查看上下级机构', types:['智能问答','政策咨询','财务问答','制度查询'], terms:{ action:'问答', total:'对话/问答次数', people:'使用人数', person:'用户', time:'发起时间', detail:'问答明细', record:'问答记录' } },
+      imSession: { title:'IM - 发起会话次数', prefix:'IMH', count:27, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计发起会话次数，可下钻查看下级机构', showTypes:false, types:['发起会话'], terms:{ action:'会话', total:'发起会话次数', people:'发起人数', person:'发起人', time:'创建时间', detail:'会话明细', record:'会话记录' } },
+      imActive: { title:'IM - 用户活跃度', prefix:'IMY', count:4, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计用户活跃度，可下钻查看下级机构', showTypes:false, types:['用户活跃'], terms:{ action:'活跃', total:'用户活跃数', people:'活跃人数', person:'用户名', time:'活跃时间', detail:'活跃明细', record:'活跃记录' } },
+      aiEmployee: { title:'AI+ 员工服务', prefix:'AIYG', count:24, mode:'application', objectLabel:'单据类型', types:['请休假申请','加班申请','收入证明'] },
+      travel: { title:'AI+ 自动化差旅', prefix:'CL', count:28, mode:'application', objectLabel:'单据类型', types:['出差申请','日常报账单','单人差旅报账单'] },
+      employeePortal: { title:'员工服务', prefix:'YG', count:186, mode:'click', objectLabel:'服务表单', types:['加班申请','相对方准入','请休假','报销单','出差申请','合同申请'] },
+      business: { title:'业务系统', prefix:'XT', count:142, mode:'click', objectLabel:'业务系统', types:['数字人力系统','财务共享系统','AI共享平台','法务系统'] }
+    };
+    function createApplicationRecords(key) {
+      const config=applicationConfigs[key],offsets={agentClick:7,toolClick:8,qaCount:9,imSession:2,imActive:4,aiEmployee:1,travel:6,employeePortal:0,business:3};
+      return Array.from({length:config.count},(_,i)=>{
+        const user=baseUsers[(i*5+offsets[key])%baseUsers.length];
+        return { id:`${config.prefix}202608${String(1001+i).padStart(4,'0')}`, name:user[0], org:user[1], dept:user[2], type:config.types[(i+(i%5===0?1:0))%config.types.length], submittedAt:`2026-08-${String(18-(i%15)).padStart(2,'0')} ${String(8+(i%10)).padStart(2,'0')}:${String((i*7)%60).padStart(2,'0')}:${String((i*11)%60).padStart(2,'0')}` };
+      });
+    }
+    const mockApplicationRecords={ agentClick:createApplicationRecords('agentClick'), toolClick:createApplicationRecords('toolClick'), qaCount:createApplicationRecords('qaCount'), imSession:createApplicationRecords('imSession'), imActive:createApplicationRecords('imActive'), aiEmployee:createApplicationRecords('aiEmployee'), travel:createApplicationRecords('travel'), employeePortal:createApplicationRecords('employeePortal'), business:createApplicationRecords('business') };
+    let activeRange = '近一月';
+    let activeTerminal = '';
+    let detailPageNo = 1;
+    let loginView = 'org';
+    let loginDrillEnterprise = '';
+    let loginCurrentEnterprise = '';
+    let loginCurrentOrg = '';
+    let activeService = 'employeePortal';
+    let appView = 'org';
+    let appCurrentOrg = '';
+    let appCurrentEnterprise = '';
+    let appDrillEnterprise = '';
+    const terminalBox = document.getElementById('terminals');
+    const content = document.getElementById('content');
+    const toast = document.getElementById('toast');
+
+    function showToast(message) {
+      toast.textContent = message; toast.classList.add('show');
+      clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+    function renderTerminals() {
+      const values = datasets[activeRange];
+      const total = values.reduce((a,b) => a+b, 0);
+      terminalBox.innerHTML = terminalNames.map((name,i) => { const share=values[i]/total*100; return `<button class="terminal ${activeTerminal===name?'active':''}" data-name="${name}" title="查看${name}终端登录记录"><span class="device">${name==='Windows'?'Win':name==='macOS'?'Mac':name}</span><span class="terminal-main"><span class="terminal-line"><span class="terminal-name">${name}</span><span class="terminal-value">${values[i]}<small>次</small></span><span class="terminal-share">占比${share.toFixed(2)}%</span></span><span class="terminal-progress"><i style="width:${share}%"></i></span></span></button>` }).join('');
+      document.getElementById('terminalHint').innerHTML = `登录次数合计 <b>${total}</b> 次 >`;
+      terminalBox.querySelectorAll('button').forEach(btn => btn.onclick = () => {
+        activeTerminal = activeTerminal === btn.dataset.name ? '' : btn.dataset.name;
+        document.getElementById('chartTitle').textContent = activeTerminal ? `${activeTerminal}终端趋势` : '系统与性能';
+        renderTerminals(); showToast(activeTerminal ? `已筛选${activeTerminal}终端` : '已取消终端筛选');
+      });
+    }
+    function renderChart() {
+      const agents=[0,280,1900,2000,120,0,0,320,900,250,0,0,0,0,0,2700,2800,5500,2100,3000,1400,0,600,3400,200,3100,3600,1600,2500,900];
+      const apiCalls=[1500,160,80,0,1400,0,0,600,2800,9200,9700,2500,0,0,0,1500,2200,0,1200,0,0,0,0,400,0,1100,700,0,1800,400];
+      const averages=[5,40,125,66,9,2,1,4,28,5,3,4,1,0,0,26,22,13,24,186,128,0,34,91,9,124,224,76,63,35];
+      const start=new Date('2026-07-20T00:00:00');
+      const dates=agents.map((_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return `${d.getMonth()+1}-${String(d.getDate()).padStart(2,'0')}`});
+      const width=920,height=330,pad={left:52,right:50,top:14,bottom:34},plotW=width-pad.left-pad.right,plotH=height-pad.top-pad.bottom;
+      const x=i=>pad.left+(plotW/(agents.length-1))*i, yTotal=v=>pad.top+plotH-(v/10000)*plotH, yAvg=v=>pad.top+plotH-(v/250)*plotH;
+      const grid=[0,2000,4000,6000,8000,10000];
+      const gridSvg=grid.map(v=>{const y=yTotal(v);return `<line class="chart-grid" x1="${pad.left}" y1="${y}" x2="${width-pad.right}" y2="${y}"/><text class="chart-axis-label" x="${pad.left-9}" y="${y+4}" text-anchor="end">${v}</text><text class="chart-axis-label" x="${width-pad.right+9}" y="${y+4}">${Math.round(v/10000*250)}</text>`}).join('');
+      const bars=agents.map((agent,i)=>{const api=apiCalls[i],barW=Math.max(7,plotW/agents.length*.42),agentY=yTotal(agent),agentH=pad.top+plotH-agentY,stackY=yTotal(agent+api),apiH=agentY-stackY;return `<rect class="chart-bar-agent" x="${x(i)-barW/2}" y="${agentY}" width="${barW}" height="${agentH}" rx="2"/><rect class="chart-bar-api" x="${x(i)-barW/2}" y="${stackY}" width="${barW}" height="${apiH}" rx="2"/>`}).join('');
+      const points=averages.map((v,i)=>`${x(i)},${yAvg(v)}`).join(' ');
+      const dots=averages.map((v,i)=>`<circle class="chart-point" cx="${x(i)}" cy="${yAvg(v)}" r="4.5"/>`).join('');
+      const labels=dates.map((date,i)=>i%4===0?`<text class="chart-axis-label" x="${x(i)}" y="${height-8}" text-anchor="middle">${date}</text>`:'').join('');
+      const hits=agents.map((_,i)=>`<rect class="chart-hit" data-index="${i}" x="${x(i)-plotW/agents.length/2}" y="${pad.top}" width="${plotW/agents.length}" height="${plotH}"/>`).join('');
+      document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="近30日智能体、API调用与人均消耗趋势">${gridSvg}${bars}<polyline class="chart-line" points="${points}"/>${dots}${labels}${hits}</svg><div class="chart-tooltip" id="chartTooltip"></div>`;
+      const tip=document.getElementById('chartTooltip');
+      document.querySelectorAll('.chart-hit').forEach(hit=>{hit.onmouseenter=e=>{const i=Number(hit.dataset.index);tip.innerHTML=`<b>2026-${dates[i]}</b><br>智能体：${agents[i].toLocaleString()}<br>API调用：${apiCalls[i].toLocaleString()}<br>人均消耗：${averages[i]}`;tip.classList.add('show')};hit.onmousemove=e=>{const box=document.getElementById('chart').getBoundingClientRect();tip.style.left=`${Math.min(e.clientX-box.left+12,box.width-155)}px`;tip.style.top=`${Math.max(8,e.clientY-box.top-88)}px`};hit.onmouseleave=()=>tip.classList.remove('show')});
+    }
+    function getFilteredRecords() {
+      const keyword = document.getElementById('detailSearch').value.trim().toLowerCase();
+      const org = document.getElementById('detailOrg').value;
+      const terminal = document.getElementById('detailTerminal').value;
+      return mockLoginRecords.filter(row => (!keyword || `${row.id} ${row.name} ${row.ip}`.toLowerCase().includes(keyword)) && (!org || row.org === org) && (!terminal || row.terminal === terminal) && (!loginCurrentEnterprise || row.org===loginCurrentEnterprise) && (!loginCurrentOrg || row.dept===loginCurrentOrg));
+    }
+    function renderDetails() {
+      const filtered = getFilteredRecords();
+      const size = Number(document.getElementById('pageSize').value);
+      const pages = Math.max(1, Math.ceil(filtered.length / size));
+      detailPageNo = Math.min(detailPageNo, pages);
+      const rows = filtered.slice((detailPageNo-1)*size, detailPageNo*size);
+      document.getElementById('detailRows').innerHTML = rows.length ? rows.map((row,i) => `<tr><td>${(detailPageNo-1)*size+i+1}</td><td>${row.id}</td><td>${row.name}</td><td>${row.org}</td><td>${row.dept}</td><td><span class="terminal-tag">${row.terminal}</span></td><td>${row.ip}</td><td class="status-ok">${row.status}</td><td>${row.desc}</td><td>${row.time}</td></tr>`).join('') : '<tr class="empty-row"><td colspan="10">暂无符合筛选条件的登录记录</td></tr>';
+      document.getElementById('detailTotal').textContent = `共 ${filtered.length} 条`;
+      const scope=loginCurrentOrg?`${loginCurrentEnterprise} / ${loginCurrentOrg==='本级（直属人员）'?loginCurrentEnterprise:loginCurrentOrg}`:loginCurrentEnterprise||document.getElementById('detailTerminal').value||'全部终端';
+      document.getElementById('detailTitle').textContent = `登录终端统计（${scope}）`;
+      const visible = pages <= 7 ? Array.from({length:pages},(_,i)=>i+1) : [1,2,3,4,5,'…',pages];
+      document.getElementById('pageNumbers').innerHTML = visible.map(p => p === '…' ? '<span style="padding:0 8px">…</span>' : `<button class="${p===detailPageNo?'active':''}" data-page="${p}">${p}</button>`).join('');
+      document.querySelectorAll('#pageNumbers button').forEach(btn => btn.onclick = () => { detailPageNo=Number(btn.dataset.page); renderDetails(); });
+      document.getElementById('pagePrev').disabled = detailPageNo === 1;
+      document.getElementById('pageNext').disabled = detailPageNo === pages;
+      document.getElementById('pagePrev').onclick = () => { if(detailPageNo>1){detailPageNo--;renderDetails();} };
+      document.getElementById('pageNext').onclick = () => { if(detailPageNo<pages){detailPageNo++;renderDetails();} };
+    }
+    function closeLoginOrgMenu() {
+      document.getElementById('loginOrgLevelMenu').classList.remove('show');
+      document.getElementById('loginOrgLevelTrigger').setAttribute('aria-expanded','false');
+    }
+    function setLoginView(view,enterprise='',org='') {
+      loginView=view;loginCurrentEnterprise=enterprise;loginCurrentOrg=org;
+      document.querySelectorAll('[data-login-view]').forEach(btn=>btn.classList.toggle('active',btn.dataset.loginView===view));
+      document.getElementById('loginOrgView').classList.toggle('hide',view!=='org');
+      document.getElementById('loginRecordView').classList.toggle('show',view==='records');
+      document.getElementById('loginSummary').classList.toggle('hide',view==='records');
+      document.getElementById('loginOrgLevelSwitch').style.display=view==='org'?'block':'none';
+      document.getElementById('loginRefresh').style.display=view==='org'?'inline-block':'none';
+      if(view==='records'){
+        document.getElementById('detailOrg').value=enterprise||'';
+        detailPageNo=1;renderDetails();
+      } else renderLoginStats();
+    }
+    function selectLoginOrgLevel(enterprise='') {
+      loginDrillEnterprise=enterprise;loginCurrentEnterprise='';loginCurrentOrg='';
+      closeLoginOrgMenu();setLoginView('org');
+    }
+    function renderLoginStats() {
+      const terminals=terminalNames,records=mockLoginRecords;
+      document.getElementById('loginSummary').innerHTML=[['登录总数',records.length],...terminals.map(name=>[name,records.filter(row=>row.terminal===name).length])].map(item=>`<div class="app-stat"><div class="app-stat-label">${item[0]}</div><div class="app-stat-value">${item[1]}</div></div>`).join('');
+      const orgMap=new Map(),enterpriseMap=new Map();
+      records.forEach(row=>{
+        const key=`${row.org}|${row.dept}`;
+        if(!orgMap.has(key))orgMap.set(key,{enterprise:row.org,org:row.dept,direct:row.dept==='本级（直属人员）',records:[]});
+        orgMap.get(key).records.push(row);
+        if(!enterpriseMap.has(row.org))enterpriseMap.set(row.org,{orgs:new Set()});
+        enterpriseMap.get(row.org).orgs.add(row.dept);
+      });
+      const enterprises=[...enterpriseMap.keys()];
+      document.getElementById('loginOrgLevelLabel').textContent=loginDrillEnterprise||'广新集团';
+      document.getElementById('loginOrgRoot').classList.toggle('active',!loginDrillEnterprise);
+      document.getElementById('loginOrgLevelChildren').innerHTML=enterprises.map(enterprise=>`<button class="org-level-option ${loginDrillEnterprise===enterprise?'active':''}" data-login-enterprise="${enterprise}"><span class="radio"></span><span>${enterprise}</span><span class="next">›</span></button>`).join('');
+      document.querySelectorAll('[data-login-enterprise]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();selectLoginOrgLevel(btn.dataset.loginEnterprise)});
+      const rows=[...orgMap.values()].filter(item=>!loginDrillEnterprise||item.enterprise===loginDrillEnterprise).sort((a,b)=>b.records.length-a.records.length);
+      document.getElementById('loginSubtitle').textContent=loginDrillEnterprise?`查看 ${loginDrillEnterprise} 下级机构登录数据`:'按组织机构统计不同终端登录次数，可下钻查看下级机构';
+      document.getElementById('loginOrgStatHint').textContent=`共 ${rows.length} 个机构，${rows.reduce((sum,item)=>sum+item.records.length,0)} 次登录`;
+      document.getElementById('loginOrgRows').innerHTML=rows.map(item=>{
+        const hasChildren=!loginDrillEnterprise&&item.direct&&(enterpriseMap.get(item.enterprise)?.orgs.size||0)>1;
+        const upAction=loginDrillEnterprise?'<button class="app-link" data-login-up>查看上级数据</button>':'<button class="app-link" disabled title="当前已是最高层级">查看上级数据</button>';
+        return `<tr><td>${item.enterprise}</td><td>${item.direct?`${item.enterprise}<span class="direct-person-note">（直属人员）</span>`:item.org}</td>${terminals.map(name=>`<td>${item.records.filter(row=>row.terminal===name).length}</td>`).join('')}<td><b>${item.records.length}</b></td><td><div class="app-actions">${hasChildren?`<button class="app-link" data-login-drill="${item.enterprise}">查看下级数据</button>`:'<button class="app-link" disabled title="当前机构无下级数据">查看下级数据</button>'}${upAction}<button class="app-link" data-login-detail-enterprise="${item.enterprise}" data-login-detail-org="${item.org}">查看明细</button></div></td></tr>`;
+      }).join('');
+      document.querySelectorAll('[data-login-drill]').forEach(btn=>btn.onclick=()=>selectLoginOrgLevel(btn.dataset.loginDrill));
+      document.querySelectorAll('[data-login-up]').forEach(btn=>btn.onclick=()=>selectLoginOrgLevel(''));
+      document.querySelectorAll('[data-login-detail-org]').forEach(btn=>btn.onclick=()=>setLoginView('records',btn.dataset.loginDetailEnterprise,btn.dataset.loginDetailOrg));
+    }
+    function openDetails() {
+      document.getElementById('detailTerminal').value = activeTerminal;
+      document.getElementById('detailDates').value = document.getElementById('dates').value;
+      document.getElementById('content').classList.add('hide');
+      document.getElementById('detailPage').classList.add('show');
+      loginDrillEnterprise='';loginCurrentEnterprise='';loginCurrentOrg='';
+      setLoginView('org');window.scrollTo(0,0);
+    }
+    function closeDetails() {
+      document.getElementById('detailPage').classList.remove('show');
+      document.getElementById('content').classList.remove('hide'); window.scrollTo(0,0);
+    }
+    function getApplicationRecords(includeOrg=true) {
+      const keyword=document.getElementById('appSearch').value.trim().toLowerCase();
+      const type=document.getElementById('appType').value;
+      return mockApplicationRecords[activeService].filter(row=>(!type||row.type===type)&&(!keyword||`${row.org} ${row.dept} ${row.name} ${row.id}`.toLowerCase().includes(keyword))&&(!includeOrg||((!appCurrentEnterprise||row.org===appCurrentEnterprise)&&(!appCurrentOrg||row.dept===appCurrentOrg))));
+    }
+    function getServiceTerms() {
+      const config=applicationConfigs[activeService],isClick=config.mode==='click';
+      return config.terms||{ action:isClick?'点击':'申请', total:isClick?'点击总数':'申请总数', people:isClick?'点击人数':'提交人数', person:isClick?'点击人':'申请人', time:isClick?'点击时间':'提交时间', detail:isClick?'点击明细':'申请明细', record:isClick?'点击记录':'申请记录' };
+    }
+    function setApplicationView(view,org='',enterprise='') {
+      if(applicationConfigs[activeService].orgOnly)view='org';
+      appView=view; appCurrentOrg=org; appCurrentEnterprise=enterprise;
+      const terms=getServiceTerms();
+      document.querySelectorAll('.app-tab').forEach(btn=>btn.classList.toggle('active',btn.dataset.appView===view));
+      document.getElementById('recordTab').textContent=terms.detail;
+      document.getElementById('recordTab').style.display=applicationConfigs[activeService].orgOnly?'none':'block';
+      document.getElementById('appOrgView').classList.toggle('hide',view!=='org');
+      document.getElementById('appRecordView').classList.toggle('show',view==='records');
+      document.getElementById('appSummary').classList.toggle('hide',view==='records');
+      const displayOrg=org==='本级（直属人员）'?enterprise:org;
+      document.getElementById('applicationSubtitle').textContent=view==='org'?`按企业、组织机构统计${applicationConfigs[activeService].objectLabel}${terms.action}总数`:org?`${enterprise} / ${displayOrg}${terms.record}`:enterprise?`${enterprise}全部机构${terms.record}`:`全部${terms.record}`;
+      renderApplicationPage();
+    }
+    function closeOrgLevelMenu() {
+      document.getElementById('orgLevelMenu').classList.remove('show');
+      document.getElementById('orgLevelTrigger').setAttribute('aria-expanded','false');
+    }
+    function selectOrgLevel(enterprise='') {
+      appDrillEnterprise=enterprise;
+      appCurrentEnterprise='';appCurrentOrg='';appView='org';
+      closeOrgLevelMenu();renderApplicationPage();
+    }
+    function renderOrgLevelSwitch(enterprises) {
+      document.getElementById('orgLevelLabel').textContent=appDrillEnterprise||'广新集团';
+      const rootOption=document.querySelector('[data-org-level="root"]');
+      rootOption.classList.toggle('active',!appDrillEnterprise);
+      rootOption.onclick=e=>{e.stopPropagation();selectOrgLevel('')};
+      document.getElementById('orgLevelChildren').innerHTML=enterprises.map(enterprise=>`<button class="org-level-option ${appDrillEnterprise===enterprise?'active':''}" data-level-enterprise="${enterprise}"><span class="radio"></span><span>${enterprise}</span><span class="next">›</span></button>`).join('');
+      document.querySelectorAll('[data-level-enterprise]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();selectOrgLevel(btn.dataset.levelEnterprise)});
+    }
+    function renderApplicationPage() {
+      const config=applicationConfigs[activeService];
+      const terms=getServiceTerms();
+      const allFiltered=getApplicationRecords(false);
+      const typeStats=config.showTypes===false?[]:config.types.map(type=>[type,allFiltered.filter(row=>row.type===type).length]);
+      document.getElementById('appSummary').innerHTML=[[terms.total,allFiltered.length],...typeStats].map(item=>`<div class="app-stat"><div class="app-stat-label">${item[0]}</div><div class="app-stat-value">${item[1]}</div></div>`).join('');
+      const orgMap=new Map(),enterpriseMap=new Map();
+      allFiltered.forEach(row=>{
+        const orgKey=`${row.org}|${row.dept}`;
+        if(!orgMap.has(orgKey))orgMap.set(orgKey,{enterprise:row.org,org:row.dept,direct:row.dept==='本级（直属人员）',records:[],people:new Set()});
+        const orgItem=orgMap.get(orgKey);orgItem.records.push(row);orgItem.people.add(row.name);
+        if(!enterpriseMap.has(row.org))enterpriseMap.set(row.org,{enterprise:row.org,records:[],people:new Set(),orgs:new Set()});
+        const enterpriseItem=enterpriseMap.get(row.org);enterpriseItem.records.push(row);enterpriseItem.people.add(row.name);enterpriseItem.orgs.add(row.dept);
+      });
+      renderOrgLevelSwitch([...enterpriseMap.keys()]);
+      const orgRows=[...orgMap.values()].filter(item=>!appDrillEnterprise||item.enterprise===appDrillEnterprise).sort((a,b)=>b.records.length-a.records.length);
+      const typeHeads=config.showTypes===false?'':config.types.map(type=>`<th>${type}</th>`).join('');
+      document.getElementById('appOrgHead').innerHTML=`<th style="width:150px">所属企业</th><th style="width:190px">所属部门</th>${typeHeads}<th style="width:120px">${terms.total}</th><th style="width:100px">${terms.people}</th><th style="width:${config.orgOnly?240:300}px">操作</th>`;
+      document.getElementById('applicationSubtitle').textContent=appDrillEnterprise?`查看 ${appDrillEnterprise} 下级机构${terms.action}数据`:(config.orgSubtitle||`按机构统计${config.objectLabel}${terms.action}总数，可下钻查看下级机构`);
+      document.getElementById('appOrgRows').innerHTML=orgRows.length?orgRows.map(item=>{
+        const hasChildren=!appDrillEnterprise&&item.direct&&(enterpriseMap.get(item.enterprise)?.orgs.size||0)>1;
+        const typeCells=config.showTypes===false?'':config.types.map(type=>`<td>${item.records.filter(row=>row.type===type).length}</td>`).join('');
+        const actions=config.orgOnly
+          ? `${hasChildren?`<button class="app-link" data-drill-enterprise="${item.enterprise}">查看下级数据</button>`:'<button class="app-link" disabled title="当前机构无下级数据">查看下级数据</button>'}${appDrillEnterprise?'<button class="app-link" data-up-level>查看上级数据</button>':'<button class="app-link" disabled title="当前已是最高层级">查看上级数据</button>'}`
+          : `${hasChildren?`<button class="app-link" data-drill-enterprise="${item.enterprise}">查看下级数据</button>`:'<button class="app-link" disabled title="当前机构无下级数据">查看下级数据</button>'}${appDrillEnterprise?'<button class="app-link" data-up-level>查看上级数据</button>':'<button class="app-link" disabled title="当前已是最高层级">查看上级数据</button>'}<button class="app-link" data-enterprise="${item.enterprise}" data-org="${item.org}">查看明细</button>`;
+        return `<tr><td>${item.enterprise}</td><td>${item.direct?`${item.enterprise}<span class="direct-person-note">（直属人员）</span>`:item.org}</td>${typeCells}<td><b>${item.records.length}</b></td><td>${item.people.size}</td><td><div class="app-actions">${actions}</div></td></tr>`;
+      }).join(''):'<tr><td class="app-empty" colspan="8">暂无符合条件的机构统计</td></tr>';
+      const visibleDirectCount=orgRows.filter(item=>item.direct).reduce((sum,item)=>sum+item.records.length,0);
+      document.getElementById('orgStatHint').textContent=`共 ${orgRows.length} 个机构，${orgRows.reduce((sum,item)=>sum+item.records.length,0)} 条${terms.record}，含 ${visibleDirectCount} 条直属人员${terms.record}`;
+      document.querySelectorAll('[data-drill-enterprise]').forEach(btn=>btn.onclick=()=>selectOrgLevel(btn.dataset.drillEnterprise));
+      document.querySelectorAll('[data-up-level]').forEach(btn=>btn.onclick=()=>selectOrgLevel(''));
+      document.querySelectorAll('.app-link[data-org]').forEach(btn=>btn.onclick=()=>setApplicationView('records',btn.dataset.org,btn.dataset.enterprise));
+      const recordRows=getApplicationRecords(true);
+      document.getElementById('recordPanelTitle').textContent=appCurrentOrg?`${appCurrentEnterprise} / ${appCurrentOrg==='本级（直属人员）'?appCurrentEnterprise:appCurrentOrg}${terms.detail}`:appCurrentEnterprise?`${appCurrentEnterprise}全部机构${terms.detail}`:`全部${terms.detail}`;
+      document.getElementById('recordStatHint').textContent=`共 ${recordRows.length} 条`;
+      const typeRecordHead=config.showTypes===false?'':`<th style="width:180px">${config.objectLabel}</th>`;
+      document.getElementById('appRecordHead').innerHTML=`<th style="width:70px">序号</th><th style="width:140px">${terms.person}</th><th style="width:180px">企业</th><th style="width:200px">所属部门</th>${typeRecordHead}<th style="width:190px">${terms.time}</th>`;
+      document.getElementById('appRecordRows').innerHTML=recordRows.length?recordRows.map((row,i)=>`<tr><td>${i+1}</td><td>${row.name}</td><td>${row.org}</td><td>${row.dept==='本级（直属人员）'?`${row.org}<span class="direct-person-note">（直属人员）</span>`:row.dept}</td>${config.showTypes===false?'':`<td>${row.type}</td>`}<td>${row.submittedAt}</td></tr>`).join(''):`<tr><td class="app-empty" colspan="${config.showTypes===false?5:6}">暂无符合条件的${terms.record}</td></tr>`;
+    }
+    function openApplication(service) {
+      activeService=service;appCurrentOrg='';appCurrentEnterprise='';appDrillEnterprise='';
+      const config=applicationConfigs[service];
+      const terms=getServiceTerms();
+      document.getElementById('applicationTitle').textContent=config.detailTitle||(config.mode==='im'?config.title:`${config.title}${terms.action}统计`);
+      document.getElementById('appType').innerHTML=`<option value="">全部${config.objectLabel}</option>${config.types.map(type=>`<option>${type}</option>`).join('')}`;
+      document.getElementById('appType').style.display=config.showTypes===false?'none':'block';
+      document.getElementById('appSearch').placeholder=`搜索组织或${terms.person}`;
+      document.getElementById('appSearch').value='';
+      document.getElementById('detailPage').classList.remove('show');
+      document.getElementById('content').classList.add('hide');
+      document.getElementById('applicationPage').classList.add('show');
+      setApplicationView('org');window.scrollTo(0,0);
+    }
+    function closeApplication() {
+      document.getElementById('applicationPage').classList.remove('show');
+      document.getElementById('content').classList.remove('hide');window.scrollTo(0,0);
+    }
+    document.getElementById('range').querySelectorAll('button').forEach(btn => btn.onclick = () => {
+      document.querySelector('#range .active').classList.remove('active'); btn.classList.add('active'); activeRange=btn.textContent;
+      const dateMap={'近一周':'2026-07-07  至  2026-07-13','近一月':'2026-06-14  至  2026-07-13','近一年':'2025-07-14  至  2026-07-13'};
+      document.getElementById('dates').value=dateMap[activeRange]; renderTerminals(); showToast(`已切换为${activeRange}`);
+    });
+    document.getElementById('org').onchange = e => showToast(`已切换至${e.target.value}`);
+    document.getElementById('refresh').onclick = () => { content.classList.add('loading'); setTimeout(()=>{content.classList.remove('loading');renderTerminals();showToast('数据已刷新');},650); };
+    document.getElementById('export').onclick = () => {
+      const rows = [['终端','登录次数'],...terminalNames.map((n,i)=>[n,datasets[activeRange][i]])];
+      const blob = new Blob(['\ufeff'+rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='登录终端统计.csv'; a.click(); URL.revokeObjectURL(a.href); showToast('导出成功');
+    };
+    document.getElementById('terminalHint').onclick = openDetails;
+    document.getElementById('backDashboard').onclick = closeDetails;
+    document.querySelectorAll('[data-login-view]').forEach(btn=>btn.onclick=()=>setLoginView(btn.dataset.loginView));
+    document.getElementById('backLoginOrg').onclick=()=>setLoginView('org');
+    document.getElementById('loginOrgLevelTrigger').onclick=e=>{
+      e.stopPropagation();
+      const menu=document.getElementById('loginOrgLevelMenu'),open=menu.classList.toggle('show');
+      e.currentTarget.setAttribute('aria-expanded',String(open));
+    };
+    document.getElementById('loginOrgLevelMenu').onclick=e=>e.stopPropagation();
+    document.getElementById('loginOrgRoot').onclick=e=>{e.stopPropagation();selectLoginOrgLevel('')};
+    document.getElementById('loginRefresh').onclick=()=>{renderLoginStats();showToast('登录统计已刷新')};
+    document.getElementById('backApplication').onclick = closeApplication;
+    document.getElementById('backOrgStats').onclick = () => setApplicationView('org');
+    document.getElementById('orgLevelTrigger').onclick = e => {
+      e.stopPropagation();
+      const menu=document.getElementById('orgLevelMenu');
+      const open=menu.classList.toggle('show');
+      e.currentTarget.setAttribute('aria-expanded',String(open));
+    };
+    document.getElementById('orgLevelMenu').onclick=e=>e.stopPropagation();
+    document.addEventListener('click',()=>{closeOrgLevelMenu();closeLoginOrgMenu()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOrgLevelMenu();closeLoginOrgMenu()}});
+    document.querySelectorAll('.app-tab').forEach(btn=>btn.onclick=()=>{if(btn.dataset.appView==='org')appDrillEnterprise='';setApplicationView(btn.dataset.appView)});
+    ['appSearch','appType'].forEach(id=>document.getElementById(id).addEventListener(id==='appSearch'?'input':'change',renderApplicationPage));
+    document.getElementById('appRefresh').onclick=()=>{renderApplicationPage();showToast(`${getServiceTerms().action}统计已刷新`)};
+    document.querySelectorAll('.service-card[data-service],.ai-card[data-service],.im-action[data-service],.smart-action[data-service]').forEach(card=>{const open=()=>openApplication(card.dataset.service);card.onclick=open;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}});
+    ['detailSearch','detailOrg','detailTerminal','detailDates','pageSize'].forEach(id => document.getElementById(id).addEventListener(id==='detailSearch'?'input':'change', () => { if(id==='detailOrg'){loginCurrentEnterprise='';loginCurrentOrg=''} detailPageNo=1; renderDetails(); }));
+    Object.keys(mockApplicationRecords).forEach(key=>{
+      const records=mockApplicationRecords[key];
+      const total=document.querySelector(`[data-service-total="${key}"]`),users=document.querySelector(`[data-service-users="${key}"]`);
+      if(total)total.textContent=records.length;
+      if(users)users.textContent=new Set(records.map(row=>row.name)).size;
+    });
+    renderTerminals(); renderChart();
+    if (location.hash === '#detail') openDetails();
+    if (location.hash.startsWith('#service=')) {
+      const service=location.hash.slice(9);
+      if(applicationConfigs[service])openApplication(service);
+    }
+  </script>
+</body>
+</html>
