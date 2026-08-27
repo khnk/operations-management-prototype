@@ -6,391 +6,1348 @@
   <title>AI共享平台 - 运营管理</title>
   <style>
     * { box-sizing: border-box; }
-    :root { --blue:#1677ff; --line:#e5e7eb; --muted:#7b8493; --bg:#f5f7fa; --text:#172033; }
-    body { margin:0; font-family:"Microsoft YaHei",Arial,sans-serif; color:var(--text); background:var(--bg); font-size:14px; }
-    button, select, input { font:inherit; }
-    button { cursor:pointer; }
-    .topbar { height:58px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 18px; position:sticky; top:0; z-index:5; }
-    .brand { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:700; white-space:nowrap; }
-    .brand-mark { width:30px; height:30px; border:3px solid #ffad33; border-radius:50% 42% 50% 40%; transform:rotate(-25deg); }
-    .crumb { margin-left:28px; padding-left:22px; border-left:1px solid var(--line); color:#697386; }
-    .top-actions { margin-left:auto; display:flex; gap:22px; align-items:center; color:#444; }
-    .badge { position:relative; }
-    .badge::after { content:"20"; position:absolute; top:-13px; right:-14px; background:#ff6b72; color:#fff; border-radius:10px; padding:1px 6px; font-size:11px; }
-    .layout { display:grid; grid-template-columns:252px minmax(0,1fr); min-height:calc(100vh - 58px); }
-    aside { background:#fff; border-right:1px solid var(--line); padding:14px 10px; }
-    .search { width:100%; height:40px; border:1px solid #d8dde6; border-radius:7px; padding:0 12px; color:#687386; }
-    nav { margin-top:16px; display:grid; gap:7px; }
-    .nav-item { height:50px; display:flex; align-items:center; gap:11px; padding:0 14px; color:#6d7686; border-radius:4px; }
-    .nav-item.active { background:var(--blue); color:#fff; }
-    .nav-icon { width:18px; text-align:center; font-size:17px; }
-    main { min-width:0; }
-    .tabbar { height:42px; background:#fff; border-bottom:1px solid var(--line); padding-left:20px; display:flex; align-items:end; }
-    .tab { color:var(--blue); border-bottom:2px solid var(--blue); padding:0 0 11px; }
-    .content { padding:22px 18px 26px; }
-    .toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
-    h1 { font-size:18px; margin:0 14px 0 0; }
-    .segmented { display:flex; border:1px solid #d9dee7; border-radius:6px; overflow:hidden; background:#fff; }
-    .segmented button { border:0; border-right:1px solid #d9dee7; padding:9px 23px; background:#fff; color:#465064; }
-    .segmented button:last-child { border-right:0; }
-    .segmented button.active { background:var(--blue); color:#fff; }
-    .field { height:38px; min-width:240px; border:1px solid #d9dee7; background:#fff; border-radius:6px; padding:0 12px; color:#566174; }
-    select.field { min-width:240px; }
-    .icon-btn { width:40px; height:38px; border:1px solid #d9dee7; background:#fff; border-radius:6px; font-size:18px; }
-    .primary { margin-left:auto; border:0; border-radius:5px; background:var(--blue); color:#fff; height:40px; padding:0 18px; font-weight:600; }
-    .grid { display:grid; grid-template-columns:1.05fr 1.35fr 1.35fr; gap:14px; margin-bottom:14px; }
-    .card { background:#fff; border:1px solid #e1e5eb; border-radius:7px; min-width:0; }
-    .card h2 { font-size:18px; margin:0; }
-    .summary { grid-column:span 1; padding:22px 20px 12px; }
-    .summary.wide { grid-column:span 2; }
-    .metrics { display:grid; grid-template-columns:repeat(3,1fr); margin-top:22px; }
-    .metrics.four { grid-template-columns:repeat(4,1fr); }
-    .metric { display:flex; gap:12px; align-items:center; padding:0 16px; border-right:1px solid var(--line); min-width:0; }
-    .metric:last-child { border-right:0; }
-    .smart-action { display:flex; align-items:center; gap:12px; padding:0 16px; border:0; border-right:1px solid var(--line); background:#fff; text-align:left; min-width:0; cursor:pointer; position:relative; }
-    .smart-action:last-child { border-right:0; }
-    .smart-action:hover,.smart-action:focus-visible { background:#f5f9ff; outline:none; }
-    .smart-action:hover .label,.smart-action:focus-visible .label { color:var(--blue); }
-    .smart-action::after { content:"›"; position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#9aa4b2; font-size:18px; }
-    .smart-action .metric-icon { background:#eaf4ff; color:var(--blue); }
-    .smart-action .label,.smart-action .value { display:block; }
-    .metric-icon { width:48px; height:48px; border-radius:7px; display:grid; place-items:center; background:#eaf4ff; color:var(--blue); font-size:23px; flex:0 0 auto; }
-    .metric:nth-child(2) .metric-icon { background:#eafbf0; color:#05b96e; }
-    .metric:nth-child(3) .metric-icon { background:#fff7e8; color:#faad14; }
-    .metric:nth-child(4) .metric-icon { background:#fff0f1; color:#ff4d5a; }
-    .label { color:#687386; margin-bottom:2px; white-space:nowrap; }
-    .value { font-size:28px; font-weight:700; line-height:1.1; }
-    .value small { font-size:14px; margin-left:4px; }
-    .terminal-card { padding:20px; margin-bottom:14px; }
-    .card-title-row { display:flex; align-items:center; justify-content:space-between; }
-    .hint { color:#8a93a3; font-size:13px; }
-    .link-hint { border:0; background:transparent; padding:4px 0; color:var(--blue); cursor:pointer; }
-    .link-hint:hover { text-decoration:underline; }
-    .terminal-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); margin-top:18px; }
-    .terminal { position:relative; display:flex; align-items:center; gap:8px; padding:12px; border:0; border-right:1px solid var(--line); background:#fff; text-align:left; min-width:0; }
-    .terminal:last-child { border-right:0; }
-    .terminal:hover { background:#f7fbff; }
-    .terminal.active { background:#f0f7ff; box-shadow:inset 0 -3px var(--blue); }
-    .device { width:44px; height:44px; border:0; border-radius:9px; color:var(--blue); background:#eaf4ff; display:grid; place-items:center; font-size:12px; font-weight:700; flex:0 0 auto; }
-    .terminal:nth-child(2) .device { color:#27ae60; border-radius:15px 15px 8px 8px; }
-    .terminal:nth-child(3) .device { color:#e59000; border-radius:50%; }
-    .terminal:nth-child(4) .device { color:#6f52d9; border-radius:4px; }
-    .terminal:nth-child(5) .device { color:#e34d59; border-radius:6px; }
-    .terminal-main { display:block; min-width:0; flex:1; }
-    .terminal-line { display:flex; align-items:baseline; gap:4px; color:#5f6b7c; white-space:nowrap; }
-    .terminal-name { color:#536072; font-size:14px; }
-    .terminal-value { color:#172033; font-size:21px; font-weight:700; }
-    .terminal-value small { font-size:12px; margin-left:2px; font-weight:400; color:#697386; }
-    .terminal-share { color:#697386; font-size:12px; }
-    .terminal-progress { display:block; height:10px; margin-top:8px; border-radius:6px; overflow:hidden; background:#e8f2ff; }
-    .terminal-progress i { display:block; min-width:2px; height:100%; border-radius:6px; background:var(--blue); }
-    .business { padding:22px 20px; min-height:164px; }
-    .business .metrics { margin-top:26px; grid-template-columns:repeat(2,1fr); }
-    .business .metric { padding-left:16px; }
-    .im-action { min-height:72px; padding:0 16px; border:0; border-right:1px solid var(--line); background:#fff; text-align:left; cursor:pointer; position:relative; }
-    .im-action:last-child { border-right:0; }
-    .im-action:hover,.im-action:focus-visible { background:#f5f9ff; outline:none; }
-    .im-action:hover .label,.im-action:focus-visible .label { color:var(--blue); }
-    .im-action::after { content:"›"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#9aa4b2; font-size:20px; }
-    .im-action .label,.im-action .value { display:block; }
-    .im-action .value { margin-top:4px; }
-    .business.ai-card { min-height:204px; padding:24px 22px; }
-    .business.ai-card { cursor:pointer; transition:border-color .18s,box-shadow .18s,transform .18s; }
-    .business.ai-card:hover,.business.ai-card:focus-visible { border-color:var(--blue); box-shadow:0 4px 14px #1677ff24; transform:translateY(-1px); outline:none; }
-    .business.ai-card.featured { border-color:var(--blue); box-shadow:0 2px 8px #1677ff1a; }
-    .business.ai-card .metrics { grid-template-columns:.72fr 1.25fr .78fr 1fr; margin-top:28px; }
-    .business.ai-card .metric { padding:0 18px; min-height:62px; align-items:flex-start; }
-    .business.ai-card .metric:first-child { padding-left:4px; }
-    .business.ai-card .metric:last-child { padding-right:0; }
-    .business.ai-card .label { font-size:15px; }
-    .business.ai-card .value { margin-top:2px; font-size:30px; white-space:nowrap; }
-    .service-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:14px; }
-    .service-card { min-height:178px; padding:22px; cursor:pointer; transition:border-color .18s,box-shadow .18s,transform .18s; }
-    .service-card:hover,.service-card:focus-visible { border-color:var(--blue); box-shadow:0 4px 14px #1677ff24; transform:translateY(-1px); outline:none; }
-    .service-card-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .service-card-head .more { color:var(--blue); font-size:13px; }
-    .service-metrics { display:grid; grid-template-columns:repeat(3,1fr); margin-top:28px; }
-    .service-metric { padding:0 18px; border-right:1px solid var(--line); min-width:0; }
-    .service-metric:first-child { padding-left:0; }
-    .service-metric:last-child { border-right:0; }
-    .service-metric .value { margin-top:5px; font-size:28px; }
-    .progress { width:145px; max-width:100%; height:14px; border-radius:7px; background:#e8f2ff; overflow:hidden; margin-top:10px; }
-    .progress span { display:block; height:100%; background:var(--blue); border-radius:7px; }
-    .lower { display:grid; grid-template-columns:minmax(340px,1.5fr) minmax(230px,1fr) minmax(600px,3fr); gap:14px; align-items:stretch; }
-    .feedback, .chart { padding:20px; min-height:430px; overflow:hidden; }
-    .resource-stats { display:grid; grid-template-rows:repeat(3,1fr); gap:14px; min-width:0; }
-    .resource-stat { padding:20px 18px; display:flex; align-items:center; gap:14px; position:relative; overflow:hidden; }
-    .resource-stat::after { content:""; position:absolute; right:0; top:34%; width:4px; height:32%; border-radius:3px 0 0 3px; background:#6657ef; }
-    .resource-stat:nth-child(2)::after { background:#1677ff; }
-    .resource-stat:nth-child(3)::after { background:#16b979; }
-    .resource-icon { width:48px; height:48px; border-radius:7px; flex:0 0 auto; display:grid; place-items:center; background:#f0edff; color:#6657ef; font-size:23px; font-weight:700; }
-    .resource-stat:nth-child(2) .resource-icon { background:#eaf4ff; color:#1677ff; }
-    .resource-stat:nth-child(3) .resource-icon { background:#eafbf0; color:#16a56a; }
-    .resource-label { color:#697386; font-size:15px; margin-bottom:5px; white-space:nowrap; }
-    .resource-value { font-size:28px; font-weight:700; white-space:nowrap; }
-    .resource-value small { font-size:13px; margin-left:5px; color:#697386; font-weight:400; }
-    .panel-subtitle { color:#8a94a3; font-size:13px; margin-top:3px; }
-    .feedback-overview { display:grid; grid-template-columns:1fr 150px 1fr; align-items:center; gap:12px; padding:18px 6px 16px; }
-    .feedback-legend { display:flex; align-items:center; gap:10px; color:#596575; }
-    .feedback-legend.right { justify-content:flex-end; }
-    .legend-dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; background:#2f88f7; }
-    .legend-dot.negative { background:#f0a12b; }
-    .feedback-name { font-size:14px; }
-    .feedback-number { font-size:22px; line-height:1.2; color:#1677ff; font-weight:700; }
-    .feedback-number.negative { color:#e99116; }
-    .donut { width:128px; height:128px; margin:auto; border-radius:50%; background:conic-gradient(#1677ff 0 66.667%,#f5a623 66.667%); position:relative; box-shadow:inset 0 0 0 1px #fff; }
-    .donut::after { content:"3\A 数量"; white-space:pre; position:absolute; inset:13px; border-radius:50%; background:#fff; display:grid; place-items:center; text-align:center; color:#687386; font-size:13px; font-weight:400; line-height:1.8; }
-    .donut::before { content:"3"; position:absolute; z-index:1; left:0; right:0; top:35px; text-align:center; color:#1f2633; font-size:26px; font-weight:700; }
-    .score-list { border-top:1px solid #edf0f4; padding-top:14px; display:grid; gap:12px; }
-    .score-head,.score-row { display:grid; grid-template-columns:88px minmax(100px,1fr) 34px; gap:12px; align-items:center; }
-    .score-head { color:#8a94a3; font-size:13px; }
-    .score-row { color:#3d4655; }
-    .score-track { height:9px; border-radius:5px; background:#eef0f3; overflow:hidden; }
-    .score-fill { display:block; height:100%; border-radius:5px; background:#1677ff; }
-    .score-fill.negative { background:#ff8a1c; }
-    .score-count { text-align:right; font-weight:600; }
-    .chart-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
-    .chart-legend { display:flex; align-items:center; gap:20px; color:#596575; white-space:nowrap; font-size:13px; padding-top:4px; }
-    .legend-bar { width:24px; height:10px; border-radius:2px; background:#247cf0; }
-    .legend-bar.api { background:#ff851b; }
-    .legend-line { width:24px; height:3px; background:#4f36e8; position:relative; }
-    .legend-line::after { content:""; position:absolute; right:-1px; top:50%; width:8px; height:8px; border-radius:50%; background:#4f36e8; border:2px solid #fff; transform:translateY(-50%); box-shadow:0 0 0 1px #4f36e8; }
-    .chart-area { height:350px; margin-top:14px; position:relative; }
-    .chart-area svg { width:100%; height:100%; display:block; overflow:visible; }
-    .chart-grid { stroke:#e7ebf0; stroke-width:1; stroke-dasharray:4 4; }
-    .chart-axis-label { fill:#7a8594; font-size:11px; }
-    .chart-bar-agent { fill:#247cf0; }
-    .chart-bar-api { fill:#ff851b; }
-    .chart-line { fill:none; stroke:#4f36e8; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; }
-    .chart-point { fill:#4f36e8; stroke:#fff; stroke-width:2; cursor:pointer; }
-    .chart-hit { fill:transparent; cursor:pointer; }
-    .chart-tooltip { position:absolute; display:none; pointer-events:none; min-width:138px; padding:9px 11px; border-radius:5px; background:#fff; border:1px solid #dfe4eb; box-shadow:0 6px 20px #1f263326; color:#3d4655; font-size:12px; line-height:1.8; z-index:2; }
-    .chart-tooltip.show { display:block; }
-    .toast { position:fixed; top:74px; left:50%; transform:translateX(-50%); background:#fff; border:1px solid #dfe5ec; box-shadow:0 5px 18px #0002; padding:11px 18px; border-radius:6px; opacity:0; pointer-events:none; transition:.2s; z-index:10; }
-    .toast.show { opacity:1; }
+    :root {
+      --blue: #006DFF;
+      --blue-deep: #005CD7;
+      --blue-hover: #1C7DFF;
+      --blue-disabled: #86BAFF;
+      --blue-text-disabled: #BEDAFF;
+      --blue-soft: #E8F3FF;
+      --green: #16c784;
+      --green-soft: #eafbf1;
+      --orange: #ffad14;
+      --orange-deep: #ff8a1c;
+      --orange-soft: #fff7e8;
+      --red: #ff6666;
+      --red-soft: #fff0f1;
+      --purple: #4b35f2;
+      --text: #1D2129;
+      --muted: #5C6478;
+      --subtle: #959EA9;
+      --line: #E5E6E8;
+      --line-dark: #C9CDD4;
+      --bg: #f3f5f8;
+      --card: #fff;
+    }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 223px minmax(0, 1fr);
+      background: var(--bg);
+    }
+    .sidebar {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-right: 1px solid var(--line);
+    }
+    .brand {
+      height: 57px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 10px;
+      color: #0b1730;
+      font-size: 21px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #1b8cff;
+      box-shadow: inset 0 0 0 3px #fff, 0 0 0 1px #7ebfff;
+    }
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      height: 7px;
+      border: 2px solid #fff;
+      border-left: 0;
+      border-right: 0;
+      border-radius: 50%;
+    }
+    .brand-mark::before { top: 10px; transform: rotate(-13deg); }
+    .brand-mark::after { bottom: 9px; transform: rotate(11deg); }
+    .menu-search {
+      height: 34px;
+      margin: 8px 8px 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      color: #9aa4b2;
+      border: 1px solid #d5dbe5;
+      border-radius: 7px;
+      background: #fff;
+    }
+    .menu-search svg { width: 16px; height: 16px; flex: 0 0 auto; }
+    .menu-search span { color: #9aa4b2; }
+    .side-nav {
+      display: grid;
+      gap: 1px;
+      padding: 0 8px;
+    }
+    .side-item {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 13px;
+      color: #526075;
+      border-radius: 4px;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+    .side-item.active {
+      color: #fff;
+      background: var(--blue);
+      font-weight: 700;
+    }
+    .side-icon {
+      width: 17px;
+      height: 17px;
+      display: grid;
+      place-items: center;
+      color: currentColor;
+      opacity: .95;
+      flex: 0 0 auto;
+    }
+    .side-icon svg,
+    .metric-icon svg,
+    .metric-icon img,
+    .terminal-icon img,
+    .resource-icon svg,
+    .resource-icon img,
+    .nav-svg { width: 100%; height: 100%; display: block; }
+    .chevron {
+      margin-left: auto;
+      width: 14px;
+      height: 14px;
+      color: currentColor;
+      opacity: .76;
+    }
+    .collapse {
+      margin-top: auto;
+      height: 30px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      padding-left: 19px;
+      color: #0b1323;
+      background: #fff;
+    }
+    .collapse svg { width: 16px; height: 16px; }
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+    .topbar {
+      height: 49px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 16px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      flex: 0 0 auto;
+    }
+    .top-title {
+      color: #3b4351;
+      font-size: 15px;
+    }
+    .top-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #202631;
+    }
+    .top-icon {
+      width: 16px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      color: currentColor;
+    }
+    .tenant {
+      max-width: 118px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #1f2633;
+    }
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 63% 38%, #f2d5ce 0 21%, transparent 22%),
+        radial-gradient(circle at 45% 78%, #7f50d8 0 34%, transparent 35%),
+        linear-gradient(135deg, #8bc7ff, #ffe0ed);
+      box-shadow: inset 0 0 0 1px #d9e1ea;
+      flex: 0 0 auto;
+    }
+    .tabbar {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      flex: 0 0 auto;
+    }
+    .tab {
+      height: 34px;
+      min-width: 88px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      color: var(--blue);
+      border-bottom: 2px solid var(--blue);
+      font-weight: 600;
+    }
+    .tabbar .down {
+      margin-left: auto;
+      margin-right: 16px;
+      width: 16px;
+      height: 16px;
+      color: #151a24;
+    }
+    .workspace {
+      min-width: 0;
+      padding: 14px 14px 14px;
+      flex: 1;
+    }
+    .toolbar {
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 14px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .title-mark {
+      width: 15px;
+      height: 15px;
+      color: var(--blue);
+      flex: 0 0 auto;
+    }
+    .segmented {
+      height: 32px;
+      display: flex;
+      overflow: hidden;
+      border: 1px solid var(--line-dark);
+      border-radius: 4px;
+      background: #fff;
+      flex: 0 0 auto;
+    }
+    .segmented button {
+      min-width: 70px;
+      height: 32px;
+      padding: 0 14px;
+      border: 0;
+      border-right: 1px solid var(--line-dark);
+      background: #fff;
+      color: #263244;
+    }
+    .segmented button:last-child { border-right: 0; }
+    .segmented button.active {
+      color: #fff;
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    .date-range,
+    .org-select,
+    .refresh {
+      height: 32px;
+      border: 1px solid var(--line-dark);
+      border-radius: 4px;
+      background: #fff;
+      color: #526075;
+    }
+    .date-range {
+      width: 244px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 11px;
+      white-space: nowrap;
+    }
+    .date-range svg { width: 14px; height: 14px; color: #8c96a6; flex: 0 0 auto; }
+    .org-select {
+      width: 204px;
+      padding: 0 34px 0 12px;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #98a2b3 50%),
+        linear-gradient(135deg, #98a2b3 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 15px,
+        calc(100% - 13px) 15px;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+    .refresh {
+      width: 32px;
+      display: grid;
+      place-items: center;
+      color: #202631;
+      font-size: 16px;
+    }
+    .export {
+      margin-left: auto;
+      height: 32px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 0;
+      border-radius: 4px;
+      color: #fff;
+      background: var(--blue);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .export svg { width: 15px; height: 15px; }
+    .dashboard {
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+    }
+    .top-grid {
+      display: grid;
+      grid-template-columns: minmax(500px, .68fr) minmax(760px, 1fr);
+      gap: 14px;
+    }
+    .middle-grid {
+      display: grid;
+      grid-template-columns: minmax(340px, .78fr) minmax(470px, 1.03fr) minmax(470px, 1.03fr);
+      gap: 14px;
+    }
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, .65fr) 254px minmax(660px, 1.35fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+    .card {
+      min-width: 0;
+      background: var(--card);
+      border: 1px solid #dfe4ec;
+      border-radius: 6px;
+      overflow: hidden;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .dashboard .card:hover,
+    .dashboard .card:focus-visible,
+    .dashboard .card:focus-within {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px rgba(22, 119, 255, .18);
+    }
+    .card h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+    .summary-card {
+      min-height: 118px;
+      padding: 16px 14px 14px;
+    }
+    .metrics {
+      display: grid;
+      margin-top: 22px;
+    }
+    .metrics.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .metrics.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .metrics.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .metric {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 22px;
+      border-right: 1px solid var(--line);
+    }
+    .metric:first-child { padding-left: 16px; }
+    .metric:last-child { padding-right: 16px; border-right: 0; }
+    .metric-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--blue);
+      background: transparent;
+      flex: 0 0 auto;
+    }
+    .metric-icon.green,
+    .metric-icon.orange,
+    .metric-icon.red { background: transparent; }
+    .label {
+      color: #526075;
+      margin-bottom: 4px;
+      white-space: nowrap;
+    }
+    .value {
+      color: #0f1725;
+      font-size: 24px;
+      line-height: 1.05;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .value small {
+      margin-left: 3px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .business-card {
+      min-height: 138px;
+      padding: 18px 14px 14px;
+    }
+    .business-card .metrics { margin-top: 22px; }
+    .business-card .metric {
+      align-items: flex-start;
+      padding: 0 26px;
+    }
+    .business-card .metric:first-child { padding-left: 16px; }
+    .business-card .metric:last-child { padding-right: 16px; }
+    .business-card .value { font-size: 24px; }
+    .business-card .metric:nth-child(2) > div { max-width: 82px; }
+    .business-card .progress { width: 72px; height: 10px; margin-top: 6px; }
+    .progress {
+      width: 122px;
+      max-width: 100%;
+      height: 11px;
+      margin-top: 8px;
+      border-radius: 999px;
+      background: #e5f1fd;
+      overflow: hidden;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      min-width: 0;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+    .terminal-card {
+      min-height: 120px;
+      padding: 18px 16px 18px;
+    }
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .total-logins {
+      color: #273244;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    .total-logins b {
+      font-size: 18px;
+      color: #0f1725;
+    }
+    .terminal-list {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .terminal-item {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 0 18px;
+      border-right: 1px solid var(--line);
+    }
+    .terminal-item:first-child { padding-left: 14px; }
+    .terminal-item:last-child { border-right: 0; padding-right: 14px; }
+    .terminal-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--blue);
+      background: transparent;
+      flex: 0 0 auto;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .terminal-name {
+      margin-bottom: 7px;
+      color: #4d5a6e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .terminal-name b {
+      color: #0f1725;
+      font-size: 18px;
+      margin: 0 2px;
+    }
+    .terminal-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #e5f1fd;
+      overflow: hidden;
+    }
+    .terminal-bar span {
+      display: block;
+      height: 100%;
+      min-width: 4px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+    .feedback-card,
+    .system-card {
+      min-height: 398px;
+      padding: 18px 14px 16px;
+    }
+    .feedback-main {
+      display: grid;
+      grid-template-columns: 1fr 146px 1fr;
+      gap: 8px;
+      align-items: center;
+      margin: 24px 8px 18px;
+    }
+    .feedback-side {
+      display: grid;
+      gap: 8px;
+      justify-items: start;
+      color: #4f5d70;
+    }
+    .feedback-side.right { justify-items: end; }
+    .legend-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--blue);
+      flex: 0 0 auto;
+    }
+    .dot.orange { background: var(--orange-deep); }
+    .feedback-number {
+      color: var(--blue);
+      font-size: 16px;
+    }
+    .feedback-number.orange { color: var(--orange-deep); }
+    .donut {
+      position: relative;
+      width: 138px;
+      height: 138px;
+      margin: auto;
+      border-radius: 50%;
+      background: conic-gradient(var(--blue) 0 100%, var(--orange-deep) 100% 100%);
+    }
+    .donut::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background: #e6f1ff;
+    }
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 21px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      place-content: center;
+      text-align: center;
+      color: #1f2633;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+    .donut-center span {
+      color: #526075;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    .score-list {
+      display: grid;
+      gap: 12px;
+      padding: 0 8px;
+    }
+    .score-head,
+    .score-row {
+      display: grid;
+      grid-template-columns: 72px minmax(110px, 1fr) 48px;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-head {
+      padding-top: 12px;
+      color: #8090a4;
+      border-top: 1px solid #dfe5ec;
+    }
+    .score-row { color: #1f2633; }
+    .score-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eceef1;
+    }
+    .score-track span {
+      display: block;
+      height: 100%;
+      min-width: 0;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+    .score-track span.orange { background: var(--orange-deep); }
+    .score-count { text-align: right; }
+    .resource-stack {
+      min-width: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .resource-card {
+      min-height: 126px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      background: #fff;
+      border: 1px solid #dfe4ec;
+      border-radius: 6px;
+    }
+    .resource-icon {
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: #7357ff;
+      background: #f0edff;
+      flex: 0 0 auto;
+    }
+    .resource-card:nth-child(2) .resource-icon {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+    .resource-label {
+      color: #526075;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    .resource-value {
+      color: #0f1725;
+      font-size: 24px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .resource-value small {
+      margin-left: 5px;
+      color: #526075;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    .system-card {
+      padding: 18px 24px 16px;
+    }
+    .chart-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #1f2633;
+      white-space: nowrap;
+    }
+    .legend-bar {
+      width: 36px;
+      height: 18px;
+      display: inline-block;
+      border-radius: 2px;
+      background: var(--blue);
+    }
+    .legend-bar.orange { background: var(--orange-deep); }
+    .legend-line {
+      position: relative;
+      width: 36px;
+      height: 16px;
+      display: inline-block;
+    }
+    .legend-line::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 7px;
+      height: 3px;
+      background: var(--purple);
+    }
+    .legend-line::after {
+      content: "";
+      position: absolute;
+      right: 4px;
+      top: 3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--purple);
+    }
+    .chart-wrap {
+      height: 320px;
+      margin-top: 2px;
+    }
+    .chart-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+    .axis { fill: #798596; font-size: 12px; }
+    .grid-line { stroke: #d8dde5; stroke-width: 1; stroke-dasharray: 4 3; }
+    .bar-agent { fill: #237dff; }
+    .bar-api { fill: var(--orange-deep); }
+    .line-avg {
+      fill: none;
+      stroke: var(--purple);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .point-avg {
+      fill: var(--purple);
+      stroke: #fff;
+      stroke-width: 3;
+    }
+    .toast {
+      position: fixed;
+      z-index: 30;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 18px;
+      color: #273244;
+      background: #fff;
+      border: 1px solid #dfe4ec;
+      border-radius: 4px;
+      box-shadow: 0 8px 24px rgba(20, 30, 48, .14);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s, transform .18s;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 6px);
+    }
     .loading .card { opacity:.55; }
-    .detail-page { display:none; padding:0; background:#fff; min-height:calc(100vh - 100px); }
+    .detail-page { display:none; padding:0; background:var(--bg); min-height:calc(100vh - 100px); }
     .detail-page.show { display:block; }
     .dashboard-page.hide { display:none; }
-    .detail-head { height:62px; padding:0 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px; font-size:17px; font-weight:600; }
-    .back-link { border:0; background:transparent; color:var(--blue); padding:0; font-size:17px; }
+    .detail-head { height:48px; padding:0 24px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px; font-size:14px; color:var(--subtle); }
+    .back-link { height:32px; border:0; background:transparent; color:var(--muted); padding:0; font-size:14px; display:inline-flex; align-items:center; }
+    .back-link:hover { color:var(--blue-hover); }
+    .breadcrumb-sep { color:#C9CDD4; }
+    .breadcrumb-current { color:var(--text); font-weight:500; }
     .detail-body { padding:22px 28px 28px; }
-    .detail-tools { display:flex; justify-content:flex-end; align-items:center; gap:18px; margin-bottom:18px; flex-wrap:wrap; }
-    .filters { display:flex; gap:10px; flex:1; justify-content:flex-end; min-width:0; }
+    .detail-control-row { min-height:36px; display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; }
+    .detail-tools { min-height:32px; display:flex; justify-content:flex-end; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
+    .filters { display:flex; gap:8px; flex:1; justify-content:flex-end; min-width:0; }
     .filters .field { min-width:180px; }
     .filters .search-field { min-width:260px; }
     #detailDates { min-width:220px; }
-    .table-wrap { overflow:auto; border:1px solid #edf0f4; border-width:0 0 1px; }
-    .data-table { width:100%; border-collapse:collapse; min-width:1320px; table-layout:fixed; }
-    .data-table th { height:58px; padding:0 16px; text-align:left; background:#f4f6f9; font-size:15px; white-space:nowrap; }
-    .data-table td { height:62px; padding:0 16px; border-bottom:1px solid #eef0f3; color:#3d4655; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .data-table tbody tr:nth-child(even) { background:#f7f9fc; }
-    .data-table tbody tr:hover { background:#eef6ff; }
-    .terminal-tag { display:inline-block; min-width:48px; padding:3px 8px; border:1px solid #91caff; border-radius:4px; color:#1677ff; text-align:center; background:#eaf4ff; }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:4px; background:#fff; }
+    .data-table { width:100%; border-collapse:separate; border-spacing:0; min-width:1320px; table-layout:fixed; }
+    .data-table th { height:48px; padding:0 16px; text-align:left; background:#F5F7FA; border-bottom:1px solid var(--line); color:var(--muted); font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .data-table td { height:52px; padding:0 16px; border-bottom:1px solid var(--line); color:#3e4858; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .data-table tbody tr:nth-child(even) { background:#F7FAFD; }
+    .data-table tbody tr:hover { background:#F2F8FF; }
+    .terminal-tag { display:inline-flex; min-width:48px; height:24px; padding:0 8px; align-items:center; justify-content:center; border:1px solid #6AA1FF; border-radius:4px; color:var(--blue); text-align:center; background:var(--blue-soft); }
     .status-ok { color:#16a56a; }
     .empty-row td { height:260px; text-align:center; color:#8b94a3; }
-    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:9px; padding-top:18px; color:#6f7785; }
-    .pagination button { min-width:38px; height:38px; border:1px solid #e0e5ec; background:#f4f6f9; border-radius:4px; color:#333b49; }
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:8px; padding-top:16px; color:var(--muted); }
+    .pagination button { min-width:32px; height:32px; border:1px solid var(--line-dark); background:#fff; border-radius:4px; color:#1D2129; }
+    .pagination button:hover:not(:disabled) { border-color:var(--blue-hover); color:var(--blue-hover); }
     .pagination button.active { background:var(--blue); color:#fff; border-color:var(--blue); }
-    .pagination button:disabled { opacity:.45; cursor:not-allowed; }
+    .pagination button:disabled { color:#C9CDD4; background:#F7F8FA; cursor:not-allowed; }
+    #pageNumbers,
+    #loginOrgPageNumbers,
+    #appOrgPageNumbers,
+    #appRecordPageNumbers { display:flex; align-items:center; gap:8px; }
     .page-size { min-width:100px!important; width:100px; }
-    .app-detail-body { padding:22px 28px 32px; }
-    .app-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+    .app-detail-body { padding:16px 24px 24px; }
+    .app-toolbar { min-height:32px; flex:1 1 auto; display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:0; flex-wrap:wrap; }
+    .app-toolbar strong { display:none; }
     .org-level-switch { position:relative; margin-left:auto; }
-    .org-level-trigger { width:250px; height:40px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; border:1px solid #cfd7e3; border-radius:5px; background:#fff; color:#3e4858; font-size:14px; }
-    .org-level-trigger:hover,.org-level-trigger[aria-expanded="true"] { border-color:#4096ff; box-shadow:0 0 0 2px rgba(22,119,255,.08); }
-    .org-level-trigger .chevron { color:#8b94a3; transition:transform .18s; }
-    .org-level-trigger[aria-expanded="true"] .chevron { transform:rotate(180deg); }
-    .org-level-menu { position:absolute; z-index:20; top:46px; left:0; width:520px; display:none; grid-template-columns:220px 1fr; border:1px solid #dfe4ec; border-radius:5px; background:#fff; box-shadow:0 8px 24px rgba(31,45,61,.14); overflow:hidden; }
+    .org-level-trigger { position:relative; width:250px; height:32px; padding:0 36px 0 12px; display:flex; align-items:center; justify-content:flex-start; border:1px solid var(--line-dark); border-radius:4px; background:#fff; color:#3e4858; font-size:14px; }
+    .org-level-trigger > span:first-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .org-level-trigger:hover,.org-level-trigger[aria-expanded="true"] { border-color:var(--blue-hover); box-shadow:0 0 0 2px rgba(0,109,255,.08); }
+    .org-level-trigger .chevron { position:absolute; right:12px; top:50%; width:16px; height:16px; color:#8b94a3; font-size:0; transform:translateY(-50%); transition:transform .18s; }
+    .org-level-trigger .chevron::before { content:""; position:absolute; left:4px; top:4px; width:7px; height:7px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); }
+    .org-level-trigger[aria-expanded="true"] .chevron { transform:translateY(-50%) rotate(180deg); }
+    .org-level-menu { position:absolute; z-index:20; top:40px; left:0; width:520px; display:none; grid-template-columns:220px 1fr; border:1px solid var(--line); border-radius:4px; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.1); overflow:hidden; }
     .org-level-menu.show { display:grid; }
-    .org-level-column { min-height:250px; padding:10px 0; }
-    .org-level-column + .org-level-column { border-left:1px solid #e8ebf0; }
-    .org-level-option { width:100%; min-height:44px; padding:0 16px; display:flex; align-items:center; gap:10px; border:0; background:#fff; color:#4e5969; text-align:left; }
-    .org-level-option:hover { background:#f5f9ff; }
-    .org-level-option.active { color:#1677ff; font-weight:600; background:#f0f7ff; }
-    .org-level-option .radio { width:16px; height:16px; border:1px solid #d6dce5; border-radius:50%; flex:0 0 auto; }
-    .org-level-option.active .radio { border:5px solid #4096ff; }
+    .org-level-column { min-height:240px; padding:8px 0; }
+    .org-level-column + .org-level-column { border-left:1px solid var(--line); }
+    .org-level-option { width:100%; min-height:40px; padding:0 16px; display:flex; align-items:center; gap:8px; border:0; background:#fff; color:var(--muted); text-align:left; }
+    .org-level-option:hover { background:#F7FBFF; color:var(--blue-hover); }
+    .org-level-option.active { color:var(--blue); font-weight:500; background:var(--blue-soft); }
+    .org-level-option .radio { width:14px; height:14px; border:1px solid var(--line-dark); border-radius:50%; flex:0 0 auto; }
+    .org-level-option.active .radio { border:4px solid var(--blue); }
     .org-level-option .next { margin-left:auto; color:#8b94a3; font-size:20px; }
-    .app-tabs { display:flex; border-bottom:1px solid var(--line); margin-bottom:18px; }
-    .app-tab { height:42px; padding:0 20px; border:0; border-bottom:2px solid transparent; background:#fff; color:#596575; }
-    .app-tab.active { color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
-    .app-filters { margin-left:auto; display:flex; gap:10px; }
+    .app-tabs { height:36px; flex:0 0 auto; display:inline-flex; align-items:stretch; gap:0; border:1px solid var(--line-dark); border-radius:4px; margin-bottom:0; overflow:hidden; background:#fff; }
+    .app-tab { height:100%; min-width:108px; padding:0 14px; display:inline-flex; align-items:center; justify-content:center; border:0; border-right:1px solid var(--line-dark); background:#fff; color:#1D2129; font-weight:400; }
+    .app-tab:last-child { border-right:0; }
+    .app-tab:hover { color:var(--blue-hover); background:#F7FBFF; }
+    .app-tab.active { color:#fff; border-right-color:var(--blue); background:var(--blue); font-weight:500; }
+    .app-tab.active + .app-tab { border-left-color:var(--blue); }
+    .app-filters { margin-left:auto; display:flex; gap:8px; }
+    .login-record-filters { display:none; flex:0 1 auto; justify-content:flex-end; }
+    #appSearch { min-width:220px; }
+    #appType { min-width:220px; }
+    #appStatus { min-width:130px; }
     .org-level-switch + .app-filters { margin-left:0; }
-    .app-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+    .app-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin-bottom:18px; }
     .app-summary.hide { display:none; }
-    .app-stat { border:1px solid var(--line); background:#fff; border-radius:6px; padding:16px 18px; }
-    .app-stat-label { color:#687386; margin-bottom:6px; }
-    .app-stat-value { font-size:27px; font-weight:700; }
-    .app-stat:nth-child(2) .app-stat-value { color:#1677ff; }
-    .app-stat:nth-child(3) .app-stat-value { color:#08a66c; }
-    .app-stat:nth-child(4) .app-stat-value { color:#d48806; }
-    .app-panel { border:1px solid var(--line); background:#fff; border-radius:7px; overflow:hidden; }
-    .app-panel-head { height:54px; padding:0 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line); font-size:16px; font-weight:600; }
+    .app-stat { position:relative; min-height:108px; overflow:hidden; border:1px solid #DDE6F4; background:linear-gradient(135deg,#fff 0%,#fff 58%,#F1F7FF 100%); border-radius:6px; padding:18px 18px 16px; box-shadow:0 2px 8px rgba(29,33,41,.06); }
+    .app-stat::after { content:""; position:absolute; right:16px; top:16px; width:50px; height:50px; border-radius:12px; background:var(--blue-soft); opacity:.9; }
+    .app-stat::before { content:""; position:absolute; right:30px; top:30px; z-index:1; width:22px; height:16px; border:3px solid var(--blue); border-radius:4px; opacity:.18; box-shadow:8px -8px 0 -3px var(--blue); }
+    .app-stat-label { position:relative; z-index:2; color:var(--muted); margin-bottom:10px; }
+    .app-stat-value { position:relative; z-index:2; font-size:30px; line-height:1.1; font-weight:700; color:var(--text); }
+    .app-stat:nth-child(2) { background:linear-gradient(135deg,#fff 0%,#fff 56%,#EEF8FF 100%); }
+    .app-stat:nth-child(2) .app-stat-value { color:var(--blue); }
+    .app-stat:nth-child(3) { background:linear-gradient(135deg,#fff 0%,#fff 56%,#EDFFF2 100%); }
+    .app-stat:nth-child(3)::after { background:#E8FFEA; }
+    .app-stat:nth-child(3)::before { border-color:#00B42A; box-shadow:8px -8px 0 -3px #00B42A; }
+    .app-stat:nth-child(3) .app-stat-value { color:#00B42A; }
+    .app-stat:nth-child(4) { background:linear-gradient(135deg,#fff 0%,#fff 56%,#FFF4E8 100%); }
+    .app-stat:nth-child(4)::after { background:#FFF3E8; }
+    .app-stat:nth-child(4)::before { border-color:#FF8018; box-shadow:8px -8px 0 -3px #FF8018; }
+    .app-stat:nth-child(4) .app-stat-value { color:#D25F00; }
+    .app-panel { border:1px solid var(--line); background:#fff; border-radius:6px; overflow:hidden; box-shadow:0 4px 14px rgba(29,33,41,.08); }
+    .app-panel-head { height:48px; padding:0 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line); font-size:14px; font-weight:500; color:var(--text); }
     .app-panel-head .hint { margin-left:auto; }
-    .app-table { width:100%; border-collapse:collapse; table-layout:fixed; }
-    .app-table th { height:48px; padding:0 14px; background:#f4f6f9; text-align:left; white-space:nowrap; }
-    .app-table td { height:54px; padding:0 14px; border-top:1px solid #edf0f4; color:#3e4858; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .app-table tbody tr:hover { background:#f7fbff; }
-    .app-link { border:0; background:transparent; color:var(--blue); padding:4px; }
+    .table-scroll { overflow:auto; }
+    .table-footer { min-height:56px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid var(--line); background:#fff; }
+    .table-footer .hint { color:var(--muted); white-space:nowrap; }
+    .compact-pagination { padding-top:0; margin-left:auto; }
+    .app-table { width:100%; min-width:1100px; border-collapse:separate; border-spacing:0; table-layout:fixed; }
+    .app-table th { height:48px; padding:0 10px; background:#F5F7FA; border-bottom:1px solid var(--line); color:var(--muted); font-weight:500; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .app-table td { height:52px; padding:0 10px; border-bottom:1px solid var(--line); color:#3e4858; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .app-table tbody tr:nth-child(even) { background:#F7FAFD; }
+    .app-table tbody tr:hover { background:#F2F8FF; }
+    .app-table .type-stat-col { width:132px; }
+    .app-table .type-stat-cell { width:132px; }
+    .app-table .app-action-col { width:300px; }
+    .app-table .app-action-cell { padding-left:4px; padding-right:24px; overflow:visible; }
+    .app-link { height:24px; display:inline-flex; align-items:center; gap:3px; border:0; background:transparent; color:var(--blue); padding:0 2px; font-size:14px; }
+    .app-link:hover:not(:disabled) { color:var(--blue-hover); }
     .app-link:disabled { color:#b8c0cc; cursor:not-allowed; text-decoration:none; }
-    .app-actions { display:flex; align-items:center; gap:8px; white-space:nowrap; }
-    .app-back-org { border:0; background:transparent; color:var(--blue); padding:0; }
-    .status-tag { display:inline-block; padding:2px 8px; border-radius:4px; background:#eaf4ff; color:#1677ff; }
-    .status-tag.approved { background:#eafbf0; color:#07965f; }
-    .status-tag.rejected { background:#fff1f0; color:#cf3f3f; }
-    .direct-person-note { margin-left:6px; color:#d46b08; font-size:12px; }
+    .app-actions { display:flex; align-items:center; justify-content:flex-start; gap:10px; white-space:nowrap; }
+    .action-icon { position:static; left:36px; top:0; width:16px; height:16px; min-width:16px; opacity:1; z-index:1; color:currentColor; }
+    .action-label { line-height:16px; }
+    .app-back-org { height:32px; border:0; background:transparent; color:var(--blue); padding:0; }
+    .app-back-org:hover { color:var(--blue-hover); }
+    .status-tag { display:inline-flex; height:24px; align-items:center; padding:0 8px; border-radius:4px; background:var(--blue-soft); color:var(--blue); }
+    .status-tag.approved { background:#E8FFEA; color:#00B42A; }
+    .status-tag.rejected { background:#FFECE8; color:#F53F3F; }
+    .direct-person-note { height:20px; margin-left:6px; padding:0 6px; display:inline-flex; align-items:center; border-radius:4px; color:#D25F00; background:#FFF3E8; font-size:12px; }
     .app-empty { height:220px!important; text-align:center; color:#8b94a3!important; }
     .app-record-view { display:none; }
     .app-record-view.show { display:block; }
     .app-org-view.hide { display:none; }
-    @media (max-width:1200px) { .layout{grid-template-columns:200px 1fr}.grid{grid-template-columns:1fr 1fr}.summary.wide{grid-column:span 1}.terminal-grid{grid-template-columns:repeat(2,1fr)}.terminal:nth-child(even){border-right:0}.terminal:nth-child(-n+4){border-bottom:1px solid var(--line)}.service-grid{grid-template-columns:1fr 1fr}.lower{grid-template-columns:1fr}.primary{margin-left:0}.app-summary{grid-template-columns:repeat(2,1fr)} }
-    @media (max-width:760px) { .layout{display:block} aside{display:none}.crumb,.top-actions span:not(:last-child){display:none}.content{padding:14px}.grid{grid-template-columns:1fr}.metrics,.metrics.four{grid-template-columns:1fr}.metric{border-right:0;border-bottom:1px solid var(--line);padding:12px 4px}.terminal-grid{grid-template-columns:1fr}.terminal{border-right:0;border-bottom:1px solid var(--line)!important}.field,select.field{width:100%;min-width:0}.segmented{width:100%}.segmented button{flex:1;padding:9px}.service-grid{grid-template-columns:1fr}.service-metrics{grid-template-columns:1fr}.service-metric{border-right:0;border-bottom:1px solid var(--line);padding:12px 0}.lower{grid-template-columns:1fr}.feedback-overview{grid-template-columns:1fr 118px 1fr}.donut{width:108px;height:108px}.donut::before{top:27px}.chart-head{display:block}.chart-legend{margin-top:10px}.chart-area{height:250px}.detail-body,.app-detail-body{padding:16px}.filters{display:grid;grid-template-columns:1fr;width:100%}.filters .field,.filters .search-field{min-width:0}.pagination{justify-content:flex-start;overflow:auto}.app-summary{grid-template-columns:1fr 1fr}.org-level-switch{width:100%;margin-left:0}.org-level-trigger{width:100%}.org-level-menu{width:100%;grid-template-columns:42% 58%}.app-filters{display:grid;grid-template-columns:1fr;width:100%;margin-left:0}.app-panel{overflow:auto}.app-table{min-width:860px} }
+    .field { height:32px; min-width:180px; border:1px solid var(--line-dark); background:#fff; border-radius:4px; padding:0 12px; color:var(--muted); outline:none; }
+    select.field { appearance:none; -webkit-appearance:none; padding-right:36px; background:#fff url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6L8 10L12 6' stroke='%238b94a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center / 16px 16px; }
+    select.field::-ms-expand { display:none; }
+    .field:hover { border-color:var(--blue-hover); }
+    .field:focus { border-color:var(--blue); box-shadow:0 0 0 2px rgba(0,109,255,.08); }
+    .icon-btn { width:32px; height:32px; border:1px solid var(--line-dark); background:#fff; border-radius:4px; font-size:16px; color:#202631; }
+    .icon-btn:hover { border-color:var(--blue-hover); color:var(--blue-hover); }
+    .link-hint { border:0; background:transparent; padding:0; color:#273244; cursor:pointer; font:inherit; }
+    .terminal-item[data-terminal], .smart-action[data-service], .im-action[data-service], .ai-card[data-service] { cursor:pointer; }
+    .terminal-item[data-terminal]:hover, .smart-action[data-service]:hover, .im-action[data-service]:hover { background:#f8fbff; }
+    @media (max-width: 1480px) {
+      .top-grid,
+      .middle-grid,
+      .bottom-grid { grid-template-columns: 1fr; }
+      .terminal-list { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 18px; }
+      .terminal-item:nth-child(3) { border-right: 0; }
+      .resource-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 1100px) {
+      .page { grid-template-columns: 76px minmax(0, 1fr); }
+      .brand { justify-content: center; padding: 0; }
+      .brand span:last-child,
+      .menu-search,
+      .side-item span:nth-child(2),
+      .chevron { display: none; }
+      .side-item { justify-content: center; padding: 0; }
+      .detail-control-row { align-items:flex-start; flex-direction:column; }
+      .app-toolbar { width:100%; justify-content:flex-start; }
+      .app-filters,
+      .filters { width:100%; justify-content:flex-start; flex-wrap:wrap; }
+    }
+    @media (max-width: 760px) {
+      .page { display: block; }
+      .sidebar { display: none; }
+      .topbar { gap: 10px; }
+      .top-actions { gap: 12px; }
+      .tenant { display: none; }
+      .workspace { padding: 14px; }
+      .toolbar { flex-wrap: wrap; }
+      .segmented,
+      .date-range,
+      .org-select,
+      .export { width: 100%; }
+      .segmented button { flex: 1; min-width: 0; padding: 0 8px; }
+      .export { margin-left: 0; }
+      .metrics.three,
+      .metrics.four,
+      .metrics.two { grid-template-columns: 1fr; margin-top: 18px; }
+      .metric,
+      .metric:first-child,
+      .metric:last-child {
+        padding: 12px 4px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .metric:last-child { border-bottom: 0; }
+      .terminal-list { grid-template-columns: 1fr; }
+      .terminal-item,
+      .terminal-item:first-child,
+      .terminal-item:last-child {
+        padding: 0;
+        border-right: 0;
+      }
+      .feedback-main { grid-template-columns: 1fr; }
+      .feedback-side,
+      .feedback-side.right { justify-items: center; }
+      .resource-stack { grid-template-columns: 1fr; }
+      .chart-head { display: block; }
+      .chart-legend { margin-top: 14px; flex-wrap: wrap; }
+      .chart-wrap { height: 300px; }
+    }
   </style>
 </head>
 <body>
-  <div id="toast" class="toast">数据已刷新</div>
-  <header class="topbar">
-    <div class="brand"><span class="brand-mark"></span>AI共享平台(内测)</div>
-    <div class="crumb">运营管理</div>
-    <div class="top-actions"><span>⛶</span><span class="badge">通知</span><span>星网⌄</span><span>系统管理员</span></div>
-  </header>
-  <div class="layout">
-    <aside>
-      <input class="search" placeholder="搜索菜单" aria-label="搜索菜单">
-      <nav>
-        <div class="nav-item active"><span class="nav-icon">▣</span>运营管理</div>
-        <div class="nav-item"><span class="nav-icon">▤</span>模型中心</div><div class="nav-item"><span class="nav-icon">◉</span>数据集管理</div>
-        <div class="nav-item"><span class="nav-icon">▦</span>模型训练</div><div class="nav-item"><span class="nav-icon">▥</span>知识库</div>
-        <div class="nav-item"><span class="nav-icon">▣</span>文件管理</div><div class="nav-item"><span class="nav-icon">▦</span>应用中心</div>
-        <div class="nav-item"><span class="nav-icon">⌂</span>资源与运维监控</div><div class="nav-item"><span class="nav-icon">☷</span>规则与模板配置</div>
-        <div class="nav-item"><span class="nav-icon">◇</span>智能体与应用业务</div><div class="nav-item"><span class="nav-icon">♙</span>用户与组织管理</div>
+  <div class="page">
+    <aside class="sidebar" aria-label="主菜单">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>AI共享平台</span>
+      </div>
+      <div class="menu-search">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>搜索菜单</span>
+      </div>
+      <nav class="side-nav">
+        <div class="side-item active"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 12l4 7h10l4-7-9-9Zm0 5 4 4-2 4h-4l-2-4 4-4Z"/></svg></span><span>运营管理</span></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2"/><rect x="6" y="5" width="4" height="4" rx="1" fill="currentColor"/><rect x="14" y="10" width="4" height="4" rx="1" fill="currentColor"/></svg></span><span>模型中心</span></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="6" rx="2" stroke="currentColor" stroke-width="2"/><rect x="4" y="14" width="16" height="6" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="7" r="1" fill="currentColor"/><circle cx="8" cy="17" r="1" fill="currentColor"/></svg></span><span>数据集管理</span></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="5" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" stroke="currentColor" stroke-width="2"/></svg></span><span>模型训练</span></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 19V6a2 2 0 0 1 2-2h10v15H7a2 2 0 0 0-2 2Z" stroke="currentColor" stroke-width="2"/><path d="M17 4h2v15" stroke="currentColor" stroke-width="2"/></svg></span><span>知识库</span></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h6l2 2h8v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="2"/></svg></span><span>文件管理</span></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span><span>应用中心</span></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20V9l7-5 7 5v11" stroke="currentColor" stroke-width="2"/><path d="M9 20v-6h6v6" stroke="currentColor" stroke-width="2"/></svg></span><span>资源与运维监控</span><svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6h14M5 12h14M5 18h14" stroke="currentColor" stroke-width="2"/><path d="M9 4v4M15 10v4M11 16v4" stroke="currentColor" stroke-width="2"/></svg></span><span>规则与模板配置</span><svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 14c4-6 8-6 12 0M3 10c4-4 8-4 12 0M15 10l6-3M15 14l6 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>智能体与应用业务</span><svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="2"/></svg></span><span>用户与组织管理</span><svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4 5 8v8l7 4 7-4V8l-7-4Z" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8.5 10l7 4M15.5 10l-7 4" stroke="currentColor" stroke-width="2"/></svg></span><span>基础管理</span><svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="side-item"><span class="side-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 19h14M7 19V9l5-4 5 4v10" stroke="currentColor" stroke-width="2"/><path d="M10 13h4" stroke="currentColor" stroke-width="2"/></svg></span><span>数智平台</span><svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
       </nav>
+      <div class="collapse" title="收起菜单">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h12M4 12h16M4 17h12M19 7l-4 5 4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
     </aside>
-    <main>
-      <div class="tabbar"><span class="tab">运营管理</span></div>
-      <section class="content dashboard-page" id="content">
+
+    <main class="main">
+      <header class="topbar">
+        <div class="top-title">运营管理</div>
+        <div class="top-actions">
+          <span class="top-icon" title="全屏"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5" stroke="currentColor" stroke-width="2"/></svg></span>
+          <span class="top-icon" title="通知"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0v4l-2 3h16l-2-3V9Z" stroke="currentColor" stroke-width="2"/><path d="M10 20h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <span class="tenant">8融合指挥...</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="avatar" aria-hidden="true"></span>
+          <span>系统管理员</span>
+        </div>
+      </header>
+
+      <div class="tabbar">
+        <div class="tab">运营管理</div>
+        <svg class="down" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </div>
+
+      <section class="workspace dashboard-page" id="content">
         <div class="toolbar">
-          <h1>运营管理</h1>
-          <div class="segmented" id="range"><button>近一周</button><button class="active">近一月</button><button>近一年</button></div>
-          <input class="field" id="dates" value="2026-06-14  至  2026-07-13" aria-label="日期范围">
-          <select class="field" id="org" aria-label="组织"><option>广新集团</option><option>广新控股</option><option>全部组织</option></select>
-          <button class="icon-btn" id="refresh" title="刷新数据" aria-label="刷新数据">↻</button>
-          <button class="primary" id="export">⇩&nbsp; 导出数据</button>
-        </div>
-        <div class="grid">
-          <div class="card summary"><h2>用户与流量</h2><div class="metrics">
-            <div class="metric"><span class="metric-icon">♙</span><div><div class="label">登录人数</div><div class="value" data-k="login">128</div></div></div>
-            <div class="metric"><span class="metric-icon">↟</span><div><div class="label">访问次数</div><div class="value">909</div></div></div>
-             <div class="metric"><span class="metric-icon">☆</span><div><div class="label">活跃用户数</div><div class="value">67</div></div></div>
-           </div>
+          <h1>
+            <svg class="title-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 3 12l4 7h10l4-7-9-9Z" stroke="currentColor" stroke-width="2"/><path d="M12 8.5 15.5 12 14 15h-4l-1.5-3L12 8.5Z" fill="currentColor"/></svg>
+            运营管理
+          </h1>
+          <div class="segmented" id="range">
+            <button type="button">近一周</button>
+            <button class="active" type="button">近一月</button>
+            <button type="button">近一年</button>
           </div>
-          <div class="card summary wide"><h2>智能体使用情况</h2><div class="metrics four">
-            <button class="smart-action" data-service="agentClick" aria-label="查看智能体点击统计"><span class="metric-icon">✺</span><span><span class="label">智能体点击数</span><span class="value">151</span></span></button>
-            <div class="metric"><span class="metric-icon">◷</span><div><div class="label">智能体响应时长</div><div class="value">11<small>秒</small></div></div></div>
-            <button class="smart-action" data-service="toolClick" aria-label="查看工具点击统计"><span class="metric-icon">⌕</span><span><span class="label">工具点击数</span><span class="value">155</span></span></button>
-            <button class="smart-action" data-service="qaCount" aria-label="查看对话问答统计"><span class="metric-icon">▣</span><span><span class="label">对话/问答次数</span><span class="value">193</span></span></button>
-           </div>
-         </div>
+          <div class="date-range" aria-label="日期范围">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2"/></svg>
+            <span>2026-07-27</span>
+            <span>至</span>
+            <span>2026-08-26</span>
+          </div>
+          <select class="org-select" id="org" aria-label="组织">
+            <option>星网信通</option>
+            <option>广新集团</option>
+            <option>集团总部</option>
+            <option>广新企运</option>
+            <option>广新研究院</option>
+          </select>
+          <button class="refresh" id="refresh" title="刷新" type="button">↻</button>
+          <button class="export" id="export" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v3a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            导出数据
+          </button>
         </div>
 
-        <div class="card terminal-card">
-          <div class="card-title-row"><h2>登录终端统计</h2><button class="hint link-hint" id="terminalHint" title="查看登录记录明细">登录次数合计 <b>1369</b> 次 ></button></div>
-          <div class="terminal-grid" id="terminals"></div>
-        </div>
+        <div class="dashboard">
+          <div class="top-grid">
+            <section class="card summary-card">
+              <h2>用户与流量</h2>
+              <div class="metrics three">
+                <div class="metric">
+                  <span class="metric-icon"><img src="assets/icons/login-user.png" alt=""></span>
+                  <div><div class="label">登录人数</div><div class="value">26</div></div>
+                </div>
+                <div class="metric">
+                  <span class="metric-icon green"><img src="assets/icons/visit-count.png" alt=""></span>
+                  <div><div class="label">访问次数</div><div class="value">2412</div></div>
+                </div>
+                <div class="metric">
+                  <span class="metric-icon orange"><img src="assets/icons/active-user.png" alt=""></span>
+                  <div><div class="label">活跃用户数</div><div class="value">5</div></div>
+                </div>
+              </div>
+            </section>
 
-        <div class="grid">
-          <div class="card business"><h2>IM</h2><div class="metrics"><button class="im-action" data-service="imSession" aria-label="查看发起会话次数统计"><span class="label">发起会话次数</span><span class="value">27</span></button><button class="im-action" data-service="imActive" aria-label="查看用户活跃度统计"><span class="label">用户活跃度</span><span class="value">4</span></button></div></div>
-          <div class="card business ai-card featured" data-service="aiEmployee" role="button" tabindex="0" aria-label="查看AI+员工服务申请统计"><h2>AI+ 员工服务</h2><div class="metrics"><div class="metric"><div><div class="label">点击数</div><div class="value">181</div></div></div><div class="metric"><div><div class="label">提单成功率</div><div class="value">0<small>%</small></div><div class="progress"><span style="width:0%"></span></div></div></div><div class="metric"><div><div class="label">成功数</div><div class="value">0</div></div></div><div class="metric"><div><div class="label">平均时长</div><div class="value">0<small>秒</small></div></div></div></div></div>
-          <div class="card business ai-card" data-service="travel" role="button" tabindex="0" aria-label="查看AI+自动化差旅申请统计"><h2>AI+ 自动化差旅</h2><div class="metrics"><div class="metric"><div><div class="label">点击数</div><div class="value">385</div></div></div><div class="metric"><div><div class="label">提单成功率</div><div class="value">70<small>%</small></div><div class="progress"><span style="width:70%"></span></div></div></div><div class="metric"><div><div class="label">成功数</div><div class="value">28</div></div></div><div class="metric"><div><div class="label">平均时长</div><div class="value">1<small>分</small>32<small>秒</small></div></div></div></div></div>
-        </div>
-        <div class="service-grid">
-          <div class="card service-card" data-service="employeePortal" role="button" tabindex="0" aria-label="查看员工服务点击统计"><div class="service-card-head"><h2>员工服务</h2><span class="more">查看统计 ›</span></div><div class="service-metrics"><div class="service-metric"><div class="label">点击总数</div><div class="value" data-service-total="employeePortal">0</div></div><div class="service-metric"><div class="label">服务表单</div><div class="value">6<small>个</small></div></div><div class="service-metric"><div class="label">点击人数</div><div class="value" data-service-users="employeePortal">0</div></div></div></div>
-          <div class="card service-card" data-service="business" role="button" tabindex="0" aria-label="查看业务系统点击统计"><div class="service-card-head"><h2>业务系统</h2><span class="more">查看统计 ›</span></div><div class="service-metrics"><div class="service-metric"><div class="label">点击总数</div><div class="value" data-service-total="business">0</div></div><div class="service-metric"><div class="label">业务系统</div><div class="value">4<small>个</small></div></div><div class="service-metric"><div class="label">点击人数</div><div class="value" data-service-users="business">0</div></div></div></div>
-        </div>
-        <div class="lower">
-          <div class="card feedback">
-            <h2>使用反馈</h2><div class="panel-subtitle">用户评价与反馈分布</div>
-            <div class="feedback-overview">
-              <div class="feedback-legend"><span class="legend-dot"></span><div><div class="feedback-name">点赞数</div><div class="feedback-number">2</div></div></div>
-              <div class="donut" aria-label="反馈总量3条，点赞2条，点踩1条"></div>
-              <div class="feedback-legend right"><span class="legend-dot negative"></span><div><div class="feedback-name">点踩数</div><div class="feedback-number negative">1</div></div></div>
-            </div>
-            <div class="score-list">
-              <div class="score-head"><span>分数</span><span></span><span>数量</span></div>
-              <div class="score-row"><span>61-100分</span><div class="score-track"><span class="score-fill" style="width:100%"></span></div><span class="score-count">2</span></div>
-              <div class="score-row"><span>41-60分</span><div class="score-track"><span class="score-fill" style="width:0%"></span></div><span class="score-count">0</span></div>
-              <div class="score-row"><span>21-40分</span><div class="score-track"><span class="score-fill negative" style="width:50%"></span></div><span class="score-count">1</span></div>
-              <div class="score-row"><span>0-20分</span><div class="score-track"><span class="score-fill negative" style="width:0%"></span></div><span class="score-count">0</span></div>
-            </div>
+            <section class="card summary-card">
+              <h2>智能体使用情况</h2>
+              <div class="metrics four">
+                <div class="metric smart-action" data-service="agentClick" role="button" tabindex="0" aria-label="查看智能体点击数统计">
+                  <span class="metric-icon"><img src="assets/icons/agent-click.png" alt=""></span>
+                  <div><div class="label">智能体点击数</div><div class="value">3885</div></div>
+                </div>
+                <div class="metric">
+                  <span class="metric-icon green"><img src="assets/icons/response-time.png" alt=""></span>
+                  <div><div class="label">智能体响应时长</div><div class="value">16<small>秒</small></div></div>
+                </div>
+                <div class="metric smart-action" data-service="toolClick" role="button" tabindex="0" aria-label="查看工具点击数统计">
+                  <span class="metric-icon orange"><img src="assets/icons/tool-click.png" alt=""></span>
+                  <div><div class="label">工具点击数</div><div class="value">38</div></div>
+                </div>
+                <div class="metric smart-action" data-service="qaCount" role="button" tabindex="0" aria-label="查看对话问答次数统计">
+                  <span class="metric-icon red"><img src="assets/icons/qa-count.png" alt=""></span>
+                  <div><div class="label">对话/问答次数</div><div class="value">1176</div></div>
+                </div>
+              </div>
+            </section>
           </div>
-          <div class="resource-stats">
-            <div class="card resource-stat"><span class="resource-icon">◎</span><div><div class="resource-label">Token 总用量</div><div class="resource-value">7.19 <small>万 万Token</small></div></div></div>
-            <div class="card resource-stat"><span class="resource-icon">◇</span><div><div class="resource-label">模型总数</div><div class="resource-value">62<small>个</small></div></div></div>
-            <div class="card resource-stat"><span class="resource-icon">✣</span><div><div class="resource-label">智能体总数</div><div class="resource-value">91<small>个</small></div></div></div>
+
+          <div class="middle-grid">
+            <section class="card business-card">
+              <h2>IM</h2>
+              <div class="metrics two">
+                <div class="metric im-action" data-service="imSession" role="button" tabindex="0" aria-label="查看发起会话次数统计">
+                  <span class="metric-icon"><img src="assets/icons/im-session.png" alt=""></span>
+                  <div><div class="label">发起会话次数</div><div class="value">5351</div></div>
+                </div>
+                <div class="metric im-action" data-service="imActive" role="button" tabindex="0" aria-label="查看用户活跃数统计">
+                  <span class="metric-icon"><img src="assets/icons/im-active.png" alt=""></span>
+                  <div><div class="label">用户活跃数</div><div class="value">13</div></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card business-card ai-card" data-service="aiEmployee" role="button" tabindex="0" aria-label="查看AI+员工服务申请统计">
+              <h2>AI+ 员工服务</h2>
+              <div class="metrics four">
+                <div class="metric"><div><div class="label">点击数</div><div class="value">78</div></div></div>
+                <div class="metric"><div><div class="label">提单成功率</div><div class="value">0<small>%</small></div><div class="progress"><span style="width:0"></span></div></div></div>
+                <div class="metric"><div><div class="label">成功数</div><div class="value">0</div></div></div>
+                <div class="metric"><div><div class="label">平均时长</div><div class="value">0<small>秒</small></div></div></div>
+              </div>
+            </section>
+
+            <section class="card business-card ai-card" data-service="travel" role="button" tabindex="0" aria-label="查看AI+自动化差旅申请统计">
+              <h2>AI+ 自动化差旅</h2>
+              <div class="metrics four">
+                <div class="metric"><div><div class="label">点击数</div><div class="value">1239</div></div></div>
+                <div class="metric"><div><div class="label">提单成功率</div><div class="value">0<small>%</small></div><div class="progress"><span style="width:0"></span></div></div></div>
+                <div class="metric"><div><div class="label">成功数</div><div class="value">0</div></div></div>
+                <div class="metric"><div><div class="label">平均时长</div><div class="value">0<small>秒</small></div></div></div>
+              </div>
+            </section>
           </div>
-          <div class="card chart">
-            <div class="chart-head"><div><h2 id="chartTitle">系统与性能</h2><div class="panel-subtitle">近30日资源消耗趋势</div></div><div class="chart-legend"><span class="legend-bar"></span><span>智能体</span><span class="legend-bar api"></span><span>API调用</span><span class="legend-line"></span><span>人均消耗</span></div></div>
-            <div class="chart-area" id="chart"><div class="chart-tooltip" id="chartTooltip"></div></div>
+
+          <section class="card terminal-card">
+            <div class="card-title-row">
+              <h2>登录终端统计</h2>
+              <button class="total-logins link-hint" id="terminalHint" type="button" title="查看登录记录明细">登录次数合计 <b>2412</b> 次</button>
+            </div>
+            <div class="terminal-list">
+              <div class="terminal-item" data-terminal="iOS" role="button" tabindex="0" aria-label="查看iOS登录明细">
+                <span class="terminal-icon"><img src="assets/icons/terminal-ios.png" alt=""></span>
+                <div><div class="terminal-name">iOS <b>18</b> 次 占比0.75%</div><div class="terminal-bar"><span style="width:.75%"></span></div></div>
+              </div>
+              <div class="terminal-item" data-terminal="安卓" role="button" tabindex="0" aria-label="查看安卓登录明细">
+                <span class="terminal-icon"><img src="assets/icons/terminal-android.png" alt=""></span>
+                <div><div class="terminal-name">安卓 <b>38</b> 次 占比1.58%</div><div class="terminal-bar"><span style="width:1.58%"></span></div></div>
+              </div>
+              <div class="terminal-item" data-terminal="鸿蒙" role="button" tabindex="0" aria-label="查看鸿蒙登录明细">
+                <span class="terminal-icon"><img src="assets/icons/terminal-harmony.png" alt=""></span>
+                <div><div class="terminal-name">鸿蒙 <b>0</b> 次 占比0%</div><div class="terminal-bar"><span style="width:0"></span></div></div>
+              </div>
+              <div class="terminal-item" data-terminal="Web" role="button" tabindex="0" aria-label="查看Web登录明细">
+                <span class="terminal-icon"><img src="assets/icons/terminal-web.png" alt=""></span>
+                <div><div class="terminal-name">Web <b>2339</b> 次 占比96.97%</div><div class="terminal-bar"><span style="width:96.97%"></span></div></div>
+              </div>
+              <div class="terminal-item" data-terminal="Windows" role="button" tabindex="0" aria-label="查看Windows登录明细">
+                <span class="terminal-icon"><img src="assets/icons/terminal-exe.png" alt=""></span>
+                <div><div class="terminal-name">Windows <b>13</b> 次 占比0.54%</div><div class="terminal-bar"><span style="width:.54%"></span></div></div>
+              </div>
+              <div class="terminal-item" data-terminal="macOS" role="button" tabindex="0" aria-label="查看macOS登录明细">
+                <span class="terminal-icon">Mac</span>
+                <div><div class="terminal-name">macOS <b>4</b> 次 占比0.17%</div><div class="terminal-bar"><span style="width:.17%"></span></div></div>
+              </div>
+            </div>
+          </section>
+
+          <div class="bottom-grid">
+            <section class="card feedback-card">
+              <h2>使用反馈</h2>
+              <div class="feedback-main">
+                <div class="feedback-side">
+                  <div class="legend-row"><span class="dot"></span><span>点赞数</span></div>
+                  <div class="feedback-number">1</div>
+                </div>
+                <div class="donut">
+                  <div class="donut-center">1<span>数量</span></div>
+                </div>
+                <div class="feedback-side right">
+                  <div class="legend-row"><span class="dot orange"></span><span>点踩数</span></div>
+                  <div class="feedback-number orange">0</div>
+                </div>
+              </div>
+              <div class="score-list">
+                <div class="score-head"><span>分数</span><span></span><span>数量</span></div>
+                <div class="score-row"><span>0-20分</span><div class="score-track"><span class="orange" style="width:0"></span></div><span class="score-count">0</span></div>
+                <div class="score-row"><span>21-40分</span><div class="score-track"><span class="orange" style="width:0"></span></div><span class="score-count">0</span></div>
+                <div class="score-row"><span>41-60分</span><div class="score-track"><span class="orange" style="width:0"></span></div><span class="score-count">0</span></div>
+                <div class="score-row"><span>61-100分</span><div class="score-track"><span style="width:100%"></span></div><span class="score-count">1</span></div>
+              </div>
+            </section>
+
+            <div class="resource-stack">
+              <section class="resource-card">
+                <span class="resource-icon"><svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="6" rx="7" ry="3" stroke="currentColor" stroke-width="2"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" stroke="currentColor" stroke-width="2"/></svg></span>
+                <div><div class="resource-label">Token 总用量</div><div class="resource-value">2115.50<small>万 Token</small></div></div>
+              </section>
+              <section class="resource-card">
+                <span class="resource-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4Z" stroke="currentColor" stroke-width="2"/><path d="m8 9 4 2 4-2M12 11v6" stroke="currentColor" stroke-width="2"/></svg></span>
+                <div><div class="resource-label">模型总数</div><div class="resource-value">10<small>个</small></div></div>
+              </section>
+            </div>
+
+            <section class="card system-card">
+              <div class="chart-head">
+                <h2>系统与性能</h2>
+                <div class="chart-legend">
+                  <span>智能体</span><span class="legend-bar"></span>
+                  <span>API调用</span><span class="legend-bar orange"></span>
+                  <span class="legend-line"></span><span>人均消耗</span>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <svg viewBox="0 0 850 330" role="img" aria-label="系统与性能趋势图">
+                  <g>
+                    <line class="grid-line" x1="50" y1="280" x2="785" y2="280"/>
+                    <line class="grid-line" x1="50" y1="224" x2="785" y2="224"/>
+                    <line class="grid-line" x1="50" y1="168" x2="785" y2="168"/>
+                    <line class="grid-line" x1="50" y1="112" x2="785" y2="112"/>
+                    <line class="grid-line" x1="50" y1="56" x2="785" y2="56"/>
+                    <text class="axis" x="12" y="284">200</text>
+                    <text class="axis" x="12" y="228">400</text>
+                    <text class="axis" x="12" y="172">600</text>
+                    <text class="axis" x="12" y="116">800</text>
+                    <text class="axis" x="6" y="60">1000</text>
+                    <text class="axis" x="806" y="284">10</text>
+                    <text class="axis" x="806" y="228">20</text>
+                    <text class="axis" x="806" y="172">30</text>
+                    <text class="axis" x="806" y="116">40</text>
+                    <text class="axis" x="806" y="60">50</text>
+                  </g>
+                  <g>
+                    <rect class="bar-agent" x="86" y="278" width="18" height="2" rx="2"/>
+                    <rect class="bar-api" x="106" y="280" width="18" height="0" rx="2"/>
+                    <rect class="bar-agent" x="188" y="278" width="18" height="2" rx="2"/>
+                    <rect class="bar-api" x="208" y="280" width="18" height="0" rx="2"/>
+                    <rect class="bar-agent" x="290" y="278" width="18" height="2" rx="2"/>
+                    <rect class="bar-api" x="310" y="280" width="18" height="0" rx="2"/>
+                    <rect class="bar-agent" x="392" y="278" width="18" height="2" rx="2"/>
+                    <rect class="bar-api" x="412" y="280" width="18" height="0" rx="2"/>
+                    <rect class="bar-agent" x="494" y="132" width="18" height="148" rx="2"/>
+                    <rect class="bar-api" x="514" y="240" width="18" height="40" rx="2"/>
+                    <rect class="bar-agent" x="596" y="280" width="18" height="0" rx="2"/>
+                    <rect class="bar-api" x="616" y="280" width="18" height="0" rx="2"/>
+                    <rect class="bar-agent" x="698" y="280" width="18" height="0" rx="2"/>
+                    <rect class="bar-api" x="718" y="280" width="18" height="0" rx="2"/>
+                    <polyline class="line-avg" points="95,280 197,280 299,280 401,280 523,90 605,246 727,280"/>
+                    <circle class="point-avg" cx="95" cy="280" r="7"/>
+                    <circle class="point-avg" cx="197" cy="280" r="7"/>
+                    <circle class="point-avg" cx="299" cy="280" r="7"/>
+                    <circle class="point-avg" cx="401" cy="280" r="7"/>
+                    <circle class="point-avg" cx="523" cy="90" r="7"/>
+                    <circle class="point-avg" cx="605" cy="246" r="7"/>
+                    <circle class="point-avg" cx="727" cy="280" r="7"/>
+                  </g>
+                  <g text-anchor="middle">
+                    <text class="axis" x="105" y="315">7-27</text>
+                    <text class="axis" x="207" y="315">8-01</text>
+                    <text class="axis" x="309" y="315">8-06</text>
+                    <text class="axis" x="411" y="315">8-11</text>
+                    <text class="axis" x="523" y="315">8-16</text>
+                    <text class="axis" x="615" y="315">8-21</text>
+                    <text class="axis" x="727" y="315">8-26</text>
+                  </g>
+                </svg>
+              </div>
+            </section>
           </div>
         </div>
       </section>
+
       <section class="detail-page" id="detailPage">
-        <div class="detail-head"><button class="back-link" id="backDashboard">运营管理</button><span>›</span><span id="detailTitle">登录终端统计</span></div>
+        <nav class="detail-head" aria-label="面包屑"><button class="back-link" id="backDashboard" type="button">运营管理</button><span class="breadcrumb-sep">/</span><span class="breadcrumb-current" id="detailTitle">登录终端统计</span></nav>
         <div class="app-detail-body">
-          <div class="app-tabs"><button class="app-tab active" data-login-view="org">组织机构统计</button><button class="app-tab" data-login-view="records">登录明细</button></div>
-          <div class="app-toolbar">
-            <strong id="loginSubtitle">按组织机构统计不同终端登录次数</strong>
-            <div class="org-level-switch" id="loginOrgLevelSwitch">
-              <button class="org-level-trigger" id="loginOrgLevelTrigger" aria-haspopup="true" aria-expanded="false"><span id="loginOrgLevelLabel">广新集团</span><span class="chevron">⌃</span></button>
-              <div class="org-level-menu" id="loginOrgLevelMenu">
-                <div class="org-level-column"><button class="org-level-option active" id="loginOrgRoot"><span class="radio"></span><span>广新集团</span><span class="next">›</span></button></div>
-                <div class="org-level-column" id="loginOrgLevelChildren"></div>
+          <div class="detail-control-row">
+            <div class="app-tabs" role="tablist" aria-label="登录终端统计视图"><button class="app-tab active" data-login-view="org" type="button" role="tab" aria-selected="true">组织机构统计</button><button class="app-tab" data-login-view="records" type="button" role="tab" aria-selected="false">登录明细</button></div>
+            <div class="app-toolbar">
+              <strong id="loginSubtitle">按组织机构统计不同终端登录次数</strong>
+              <div class="org-level-switch" id="loginOrgLevelSwitch">
+                <button class="org-level-trigger" id="loginOrgLevelTrigger" aria-haspopup="true" aria-expanded="false"><span id="loginOrgLevelLabel">广新集团</span><span class="chevron">⌃</span></button>
+                <div class="org-level-menu" id="loginOrgLevelMenu">
+                  <div class="org-level-column"><button class="org-level-option active" id="loginOrgRoot"><span class="radio"></span><span>广新集团</span><span class="next">›</span></button></div>
+                  <div class="org-level-column" id="loginOrgLevelChildren"></div>
+                </div>
               </div>
+              <button class="icon-btn" id="loginRefresh" title="刷新登录统计" aria-label="刷新登录统计">↻</button>
+              <div class="filters login-record-filters" id="loginRecordFilters"><button class="app-back-org" id="backLoginOrg" type="button" hidden>‹ 返回组织统计</button><input class="field search-field" id="detailSearch" placeholder="搜索访问编号、用户名或 IP" aria-label="搜索明细"><select class="field" id="detailOrg" aria-label="所属企业"><option value="">全部企业</option><option>AI项目组</option><option>集团总部</option><option>香港投资</option><option>国义招标</option><option>广新研究院</option></select><select class="field" id="detailTerminal" aria-label="终端类型"><option value="">全部终端</option><option>iOS</option><option>安卓</option><option>鸿蒙</option><option>Web</option><option>Windows</option><option>macOS</option></select><input class="field" id="detailDates" value="2026-06-14  至  2026-07-13" aria-label="日期范围"><button class="icon-btn" id="loginRecordRefresh" title="刷新登录明细" aria-label="刷新登录明细">↻</button></div>
             </div>
-            <button class="icon-btn" id="loginRefresh" title="刷新登录统计" aria-label="刷新登录统计">↻</button>
           </div>
           <div class="app-summary" id="loginSummary"></div>
           <div class="app-org-view" id="loginOrgView">
-            <div class="app-panel"><div class="app-panel-head"><span class="hint" id="loginOrgStatHint"></span></div><table class="app-table"><thead><tr><th style="width:150px">所属企业</th><th style="width:190px">所属部门</th><th>iOS</th><th>安卓</th><th>鸿蒙</th><th>Web</th><th>Windows</th><th>macOS</th><th style="width:90px">登录总数</th><th style="width:300px">操作</th></tr></thead><tbody id="loginOrgRows"></tbody></table></div>
+            <div class="app-panel">
+              <div class="table-scroll"><table class="app-table"><thead><tr><th style="width:130px">所属企业</th><th style="width:170px">所属部门</th><th>iOS</th><th>安卓</th><th>鸿蒙</th><th>Web</th><th>Windows</th><th>macOS</th><th style="width:84px">登录总数</th><th class="app-action-col" style="width:300px">操作</th></tr></thead><tbody id="loginOrgRows"></tbody></table></div>
+              <div class="table-footer"><span class="hint" id="loginOrgStatHint"></span><div class="pagination compact-pagination"><select class="field page-size" id="loginOrgPageSize"><option value="10">10条/页</option><option value="20">20条/页</option></select><button id="loginOrgPagePrev" aria-label="上一页">‹</button><span id="loginOrgPageNumbers"></span><button id="loginOrgPageNext" aria-label="下一页">›</button></div></div>
+            </div>
           </div>
           <div class="app-record-view" id="loginRecordView">
-            <div class="detail-tools"><button class="app-back-org" id="backLoginOrg">‹ 返回组织统计</button><div class="filters"><input class="field search-field" id="detailSearch" placeholder="搜索访问编号、用户名或 IP" aria-label="搜索明细"><select class="field" id="detailOrg" aria-label="所属企业"><option value="">全部企业</option><option>AI项目组</option><option>集团总部</option><option>香港投资</option><option>国义招标</option><option>广新研究院</option></select><select class="field" id="detailTerminal" aria-label="终端类型"><option value="">全部终端</option><option>iOS</option><option>安卓</option><option>鸿蒙</option><option>Web</option><option>Windows</option><option>macOS</option></select><input class="field" id="detailDates" value="2026-06-14  至  2026-07-13" aria-label="日期范围"></div></div>
             <div class="table-wrap"><table class="data-table"><thead><tr><th style="width:70px">序号</th><th style="width:110px">访问编号</th><th style="width:140px">用户名</th><th style="width:170px">所属企业</th><th style="width:190px">所属部门</th><th style="width:110px">终端类型</th><th style="width:145px">地址</th><th style="width:90px">状态</th><th style="width:120px">描述</th><th style="width:180px">访问时间</th></tr></thead><tbody id="detailRows"></tbody></table></div>
             <div class="pagination"><span id="detailTotal">共 0 条</span><select class="field page-size" id="pageSize"><option value="10">10条/页</option><option value="20">20条/页</option></select><button id="pagePrev" aria-label="上一页">‹</button><span id="pageNumbers"></span><button id="pageNext" aria-label="下一页">›</button></div>
           </div>
         </div>
       </section>
       <section class="detail-page" id="applicationPage">
-        <div class="detail-head"><button class="back-link" id="backApplication">运营管理</button><span>›</span><span id="applicationTitle">员工服务点击统计</span></div>
+        <nav class="detail-head" aria-label="面包屑"><button class="back-link" id="backApplication" type="button">运营管理</button><span class="breadcrumb-sep">/</span><span class="breadcrumb-current" id="applicationTitle">员工服务点击统计</span></nav>
         <div class="app-detail-body">
-          <div class="app-tabs"><button class="app-tab active" data-app-view="org">组织机构统计</button><button class="app-tab" id="recordTab" data-app-view="records">点击明细</button></div>
-          <div class="app-toolbar">
-            <strong id="applicationSubtitle">按组织机构统计不同表单点击总数</strong>
-            <div class="org-level-switch" id="orgLevelSwitch">
-              <button class="org-level-trigger" id="orgLevelTrigger" aria-haspopup="true" aria-expanded="false"><span id="orgLevelLabel">广新集团</span><span class="chevron">⌃</span></button>
-              <div class="org-level-menu" id="orgLevelMenu">
-                <div class="org-level-column"><button class="org-level-option active" data-org-level="root"><span class="radio"></span><span>广新集团</span><span class="next">›</span></button></div>
-                <div class="org-level-column" id="orgLevelChildren"></div>
+          <div class="detail-control-row">
+            <div class="app-tabs" role="tablist" aria-label="业务统计视图"><button class="app-tab active" data-app-view="org" type="button" role="tab" aria-selected="true">组织机构统计</button><button class="app-tab" id="recordTab" data-app-view="records" type="button" role="tab" aria-selected="false">点击明细</button></div>
+            <div class="app-toolbar">
+              <strong id="applicationSubtitle">按组织机构统计不同表单点击总数</strong>
+              <div class="org-level-switch" id="orgLevelSwitch">
+                <button class="org-level-trigger" id="orgLevelTrigger" aria-haspopup="true" aria-expanded="false"><span id="orgLevelLabel">广新集团</span><span class="chevron">⌃</span></button>
+                <div class="org-level-menu" id="orgLevelMenu">
+                  <div class="org-level-column"><button class="org-level-option active" data-org-level="root"><span class="radio"></span><span>广新集团</span><span class="next">›</span></button></div>
+                  <div class="org-level-column" id="orgLevelChildren"></div>
+                </div>
               </div>
+              <div class="app-filters"><input class="field" id="appSearch" placeholder="搜索组织或点击人" aria-label="搜索点击记录"><select class="field" id="appType" aria-label="点击对象"></select><select class="field" id="appStatus" aria-label="成功失败状态"><option value="">全部结果</option><option value="success">成功</option><option value="failure">失败</option></select><button class="icon-btn" id="appRefresh" title="刷新统计" aria-label="刷新统计">↻</button></div>
             </div>
-            <div class="app-filters"><input class="field" id="appSearch" placeholder="搜索组织或点击人" aria-label="搜索点击记录"><select class="field" id="appType" aria-label="点击对象"></select><button class="icon-btn" id="appRefresh" title="刷新统计" aria-label="刷新统计">↻</button></div>
           </div>
           <div class="app-summary" id="appSummary"></div>
           <div class="app-org-view" id="appOrgView">
-            <div class="app-panel"><div class="app-panel-head"><span class="hint" id="orgStatHint"></span></div><table class="app-table"><thead><tr id="appOrgHead"></tr></thead><tbody id="appOrgRows"></tbody></table></div>
+            <div class="app-panel">
+              <div class="table-scroll"><table class="app-table"><thead><tr id="appOrgHead"></tr></thead><tbody id="appOrgRows"></tbody></table></div>
+              <div class="table-footer"><span class="hint" id="orgStatHint"></span><div class="pagination compact-pagination"><select class="field page-size" id="appOrgPageSize"><option value="10">10条/页</option><option value="20">20条/页</option></select><button id="appOrgPagePrev" aria-label="上一页">‹</button><span id="appOrgPageNumbers"></span><button id="appOrgPageNext" aria-label="下一页">›</button></div></div>
+            </div>
           </div>
           <div class="app-record-view" id="appRecordView">
-            <div class="app-panel"><div class="app-panel-head"><button class="app-back-org" id="backOrgStats">‹ 返回组织统计</button><span id="recordPanelTitle">全部点击明细</span><span class="hint" id="recordStatHint"></span></div><table class="app-table"><thead><tr id="appRecordHead"></tr></thead><tbody id="appRecordRows"></tbody></table></div>
+            <div class="app-panel">
+              <div class="app-panel-head"><button class="app-back-org" id="backOrgStats">‹ 返回组织统计</button><span id="recordPanelTitle">全部点击明细</span></div>
+              <div class="table-scroll"><table class="app-table"><thead><tr id="appRecordHead"></tr></thead><tbody id="appRecordRows"></tbody></table></div>
+              <div class="table-footer"><span class="hint" id="recordStatHint"></span><div class="pagination compact-pagination"><select class="field page-size" id="appRecordPageSize"><option value="10">10条/页</option><option value="20">20条/页</option></select><button id="appRecordPagePrev" aria-label="上一页">‹</button><span id="appRecordPageNumbers"></span><button id="appRecordPageNext" aria-label="下一页">›</button></div></div>
+            </div>
           </div>
         </div>
+          <input type="hidden" id="dates" value="2026-07-27  至  2026-08-26">
+          <div id="terminals" hidden></div>
+          <h2 id="chartTitle" hidden>系统与性能</h2>
+          <div id="chart" hidden></div>
       </section>
     </main>
   </div>
+  <div class="toast" id="toast">数据已刷新</div>
+
   <script>
     const datasets = {
-      '近一周': [18, 10, 7, 250, 37, 0],
-      '近一月': [77, 43, 32, 1058, 158, 1],
-      '近一年': [924, 516, 384, 12696, 1896, 12]
+      '近一周': [5, 9, 0, 584, 3, 1],
+      '近一月': [18, 38, 0, 2339, 13, 4],
+      '近一年': [216, 456, 0, 28068, 156, 48]
     };
     const terminalNames = ['iOS', '安卓', '鸿蒙', 'Web', 'Windows', 'macOS'];
     const baseUsers = [
@@ -401,22 +1358,22 @@
       ['郑十一','国义招标','信息中心','192.0.2.19'],['冯十二','集团总部','财务管理部','192.0.2.20'],
       ['陈十三','集团总部','财务资金部','192.0.2.21'],['褚十四','广新研究院','本级（直属人员）','192.0.2.22']
     ];
-    const mockLoginRecords = Array.from({length:1369}, (_,i) => {
+    const mockLoginRecords = Array.from({length:2412}, (_,i) => {
       const user = baseUsers[i % baseUsers.length];
-      const terminal = i < 77 ? 'iOS' : i < 120 ? '安卓' : i < 152 ? '鸿蒙' : i < 1210 ? 'Web' : i < 1368 ? 'Windows' : 'macOS';
+      const terminal = i < 18 ? 'iOS' : i < 56 ? '安卓' : i < 56 ? '鸿蒙' : i < 2395 ? 'Web' : i < 2408 ? 'Windows' : 'macOS';
       const hour = String(17 - (i % 9)).padStart(2,'0');
       const minute = String((14 + i * 7) % 60).padStart(2,'0');
       const second = String((36 + i * 11) % 60).padStart(2,'0');
       return { id:174187-i*31, name:user[0], org:user[1], dept:user[2], terminal, ip:user[3], status:'成功', desc:'登录成功', time:`2026-07-${String(13-Math.floor(i/42)).padStart(2,'0')} ${hour}:${minute}:${second}` };
     });
     const applicationConfigs = {
-      agentClick: { title:'智能体点击数', detailTitle:'智能体点击数统计', prefix:'ZNT', count:151, mode:'click', orgOnly:true, objectLabel:'智能体名称', orgSubtitle:'按机构统计不同智能体点击数，可查看上下级机构', types:['广新智能助手','AI+财务自动差旅','智能问答','法智小新','智能摘要','智能数据'], terms:{ action:'点击', total:'智能体点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
-      toolClick: { title:'工具点击数', detailTitle:'工具点击数统计', prefix:'GJ', count:155, mode:'click', orgOnly:true, objectLabel:'工具名称', orgSubtitle:'按机构统计不同工具点击数，可查看上下级机构', types:['知识库检索','文件解析','数据查询','表单生成'], terms:{ action:'点击', total:'工具点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
-      qaCount: { title:'对话/问答次数', detailTitle:'对话/问答次数统计', prefix:'WD', count:193, mode:'click', orgOnly:true, objectLabel:'问答场景', orgSubtitle:'按机构统计不同问答场景次数，可查看上下级机构', types:['智能问答','政策咨询','财务问答','制度查询'], terms:{ action:'问答', total:'对话/问答次数', people:'使用人数', person:'用户', time:'发起时间', detail:'问答明细', record:'问答记录' } },
-      imSession: { title:'IM - 发起会话次数', prefix:'IMH', count:27, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计发起会话次数，可下钻查看下级机构', showTypes:false, types:['发起会话'], terms:{ action:'会话', total:'发起会话次数', people:'发起人数', person:'发起人', time:'创建时间', detail:'会话明细', record:'会话记录' } },
-      imActive: { title:'IM - 用户活跃度', prefix:'IMY', count:4, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计用户活跃度，可下钻查看下级机构', showTypes:false, types:['用户活跃'], terms:{ action:'活跃', total:'用户活跃数', people:'活跃人数', person:'用户名', time:'活跃时间', detail:'活跃明细', record:'活跃记录' } },
-      aiEmployee: { title:'AI+ 员工服务', prefix:'AIYG', count:24, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['请休假申请','加班申请','收入证明'] },
-      travel: { title:'AI+ 自动化差旅', prefix:'CL', count:28, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['出差申请','日常报账单','单人差旅报账单'] },
+      agentClick: { title:'智能体点击数', detailTitle:'智能体点击数统计', prefix:'ZNT', count:3885, mode:'click', orgOnly:true, objectLabel:'智能体名称', orgSubtitle:'按机构统计不同智能体点击数，可查看上下级机构', types:['广新智能助手','AI+财务自动差旅','智能问答','法智小新','智能摘要','智能数据'], terms:{ action:'点击', total:'智能体点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
+      toolClick: { title:'工具点击数', detailTitle:'工具点击数统计', prefix:'GJ', count:38, mode:'click', orgOnly:true, objectLabel:'工具名称', orgSubtitle:'按机构统计不同工具点击数，可查看上下级机构', types:['知识库检索','文件解析','数据查询','表单生成'], terms:{ action:'点击', total:'工具点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
+      qaCount: { title:'对话/问答次数', detailTitle:'对话/问答次数统计', prefix:'WD', count:1176, mode:'click', orgOnly:true, objectLabel:'问答场景', orgSubtitle:'按机构统计不同问答场景次数，可查看上下级机构', types:['智能问答','政策咨询','财务问答','制度查询'], terms:{ action:'问答', total:'对话/问答次数', people:'使用人数', person:'用户', time:'发起时间', detail:'问答明细', record:'问答记录' } },
+      imSession: { title:'IM - 发起会话次数', prefix:'IMH', count:5351, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计发起会话次数，可下钻查看下级机构', showTypes:false, types:['发起会话'], terms:{ action:'会话', total:'发起会话次数', people:'发起人数', person:'发起人', time:'创建时间', detail:'会话明细', record:'会话记录' } },
+      imActive: { title:'IM - 用户活跃度', prefix:'IMY', count:13, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计用户活跃度，可下钻查看下级机构', showTypes:false, types:['用户活跃'], terms:{ action:'活跃', total:'用户活跃数', people:'活跃人数', person:'用户名', time:'活跃时间', detail:'活跃明细', record:'活跃记录' } },
+      aiEmployee: { title:'AI+ 员工服务', prefix:'AIYG', count:78, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['请休假申请','加班申请','收入证明'] },
+      travel: { title:'AI+ 自动化差旅', prefix:'CL', count:1239, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['出差申请','日常报账单','单人差旅报账单'] },
       employeePortal: { title:'员工服务', prefix:'YG', count:186, mode:'click', objectLabel:'服务表单', types:['加班申请','相对方准入','请休假','报销单','出差申请','合同申请'] },
       business: { title:'业务系统', prefix:'XT', count:142, mode:'click', objectLabel:'业务系统', types:['数字人力系统','财务共享系统','AI共享平台','法务系统'] }
     };
@@ -433,12 +1390,15 @@
     let activeRange = '近一月';
     let activeTerminal = '';
     let detailPageNo = 1;
+    let loginOrgPageNo = 1;
     let loginView = 'org';
     let loginDrillEnterprise = '';
     let loginCurrentEnterprise = '';
     let loginCurrentOrg = '';
     let activeService = 'employeePortal';
     let appView = 'org';
+    let appOrgPageNo = 1;
+    let appRecordPageNo = 1;
     let appCurrentOrg = '';
     let appCurrentEnterprise = '';
     let appDrillEnterprise = '';
@@ -449,6 +1409,52 @@
     function showToast(message) {
       toast.textContent = message; toast.classList.add('show');
       clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+    function getVisiblePages(page,pages) {
+      if(pages<=7)return Array.from({length:pages},(_,i)=>i+1);
+      if(page<=4)return [1,2,3,4,5,'…',pages];
+      if(page>=pages-3)return [1,'…',pages-4,pages-3,pages-2,pages-1,pages];
+      return [1,'…',page-1,page,page+1,'…',pages];
+    }
+    function renderCompactPager(prefix,total,page,size,onPageChange) {
+      const pages=Math.max(1,Math.ceil(total/size));
+      const safePage=Math.min(Math.max(1,page),pages);
+      const numbers=document.getElementById(`${prefix}PageNumbers`);
+      const prev=document.getElementById(`${prefix}PagePrev`);
+      const next=document.getElementById(`${prefix}PageNext`);
+      numbers.innerHTML=getVisiblePages(safePage,pages).map(p=>p==='…'?'<span style="padding:0 6px">…</span>':`<button class="${p===safePage?'active':''}" data-page="${p}">${p}</button>`).join('');
+      numbers.querySelectorAll('button').forEach(btn=>btn.onclick=()=>onPageChange(Number(btn.dataset.page)));
+      prev.disabled=safePage===1;
+      next.disabled=safePage===pages;
+      prev.onclick=()=>{if(safePage>1)onPageChange(safePage-1)};
+      next.onclick=()=>{if(safePage<pages)onPageChange(safePage+1)};
+      return safePage;
+    }
+    function viewActionIcon() {
+      return '<svg class="action-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1.35 8s2.35-4.2 6.65-4.2S14.65 8 14.65 8 12.3 12.2 8 12.2 1.35 8 1.35 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="2.1" stroke="currentColor" stroke-width="1.5"/></svg>';
+    }
+    function applyActionIcons(root) {
+      root.querySelectorAll('.app-actions .app-link').forEach(btn=>{
+        const originalText=btn.dataset.fullLabel||btn.textContent.trim();
+        const compactText=originalText==='查看下级数据'?'下级数据':originalText==='查看上级数据'?'上级数据':originalText;
+        btn.dataset.fullLabel=originalText;
+        btn.setAttribute('aria-label',originalText);
+        btn.textContent='';
+        btn.insertAdjacentHTML('beforeend',viewActionIcon());
+        const label=document.createElement('span');
+        label.className='action-label';
+        label.textContent=compactText;
+        btn.appendChild(label);
+      });
+    }
+    function applyOverflowTitles(root) {
+      root.querySelectorAll('th,td').forEach(cell=>{
+        if(cell.classList.contains('app-action-cell'))return;
+        const text=cell.textContent.trim().replace(/\s+/g,' ');
+        if(!text)return;
+        if(cell.scrollWidth>cell.clientWidth||text.length>8)cell.setAttribute('title',text);
+        else cell.removeAttribute('title');
+      });
     }
     function renderTerminals() {
       const values = datasets[activeRange];
@@ -503,6 +1509,7 @@
       document.getElementById('pageNext').disabled = detailPageNo === pages;
       document.getElementById('pagePrev').onclick = () => { if(detailPageNo>1){detailPageNo--;renderDetails();} };
       document.getElementById('pageNext').onclick = () => { if(detailPageNo<pages){detailPageNo++;renderDetails();} };
+      applyOverflowTitles(document.getElementById('detailRows').closest('table'));
     }
     function closeLoginOrgMenu() {
       document.getElementById('loginOrgLevelMenu').classList.remove('show');
@@ -510,12 +1517,17 @@
     }
     function setLoginView(view,enterprise='',org='') {
       loginView=view;loginCurrentEnterprise=enterprise;loginCurrentOrg=org;
-      document.querySelectorAll('[data-login-view]').forEach(btn=>btn.classList.toggle('active',btn.dataset.loginView===view));
+      document.querySelectorAll('[data-login-view]').forEach(btn=>{
+        const active=btn.dataset.loginView===view;
+        btn.classList.toggle('active',active);
+        btn.setAttribute('aria-selected',String(active));
+      });
       document.getElementById('loginOrgView').classList.toggle('hide',view!=='org');
       document.getElementById('loginRecordView').classList.toggle('show',view==='records');
       document.getElementById('loginSummary').classList.toggle('hide',view==='records');
       document.getElementById('loginOrgLevelSwitch').style.display=view==='org'?'block':'none';
       document.getElementById('loginRefresh').style.display=view==='org'?'inline-block':'none';
+      document.getElementById('loginRecordFilters').style.display=view==='records'?'flex':'none';
       if(view==='records'){
         document.getElementById('detailOrg').value=enterprise||'';
         detailPageNo=1;renderDetails();
@@ -523,6 +1535,7 @@
     }
     function selectLoginOrgLevel(enterprise='') {
       loginDrillEnterprise=enterprise;loginCurrentEnterprise='';loginCurrentOrg='';
+      loginOrgPageNo=1;
       closeLoginOrgMenu();setLoginView('org');
     }
     function renderLoginStats() {
@@ -543,12 +1556,17 @@
       document.querySelectorAll('[data-login-enterprise]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();selectLoginOrgLevel(btn.dataset.loginEnterprise)});
       const rows=[...orgMap.values()].filter(item=>!loginDrillEnterprise||item.enterprise===loginDrillEnterprise).sort((a,b)=>b.records.length-a.records.length);
       document.getElementById('loginSubtitle').textContent=loginDrillEnterprise?`查看 ${loginDrillEnterprise} 下级机构登录数据`:'按组织机构统计不同终端登录次数，可下钻查看下级机构';
+      const loginOrgSize=Number(document.getElementById('loginOrgPageSize').value);
+      loginOrgPageNo=renderCompactPager('loginOrg',rows.length,loginOrgPageNo,loginOrgSize,page=>{loginOrgPageNo=page;renderLoginStats()});
+      const pagedRows=rows.slice((loginOrgPageNo-1)*loginOrgSize,loginOrgPageNo*loginOrgSize);
       document.getElementById('loginOrgStatHint').textContent=`共 ${rows.length} 个机构，${rows.reduce((sum,item)=>sum+item.records.length,0)} 次登录`;
-      document.getElementById('loginOrgRows').innerHTML=rows.map(item=>{
+      document.getElementById('loginOrgRows').innerHTML=pagedRows.map(item=>{
         const hasChildren=!loginDrillEnterprise&&item.direct&&(enterpriseMap.get(item.enterprise)?.orgs.size||0)>1;
         const upAction=loginDrillEnterprise?'<button class="app-link" data-login-up>查看上级数据</button>':'<button class="app-link" disabled title="当前已是最高层级">查看上级数据</button>';
-        return `<tr><td>${item.enterprise}</td><td>${item.direct?`${item.enterprise}<span class="direct-person-note">（直属人员）</span>`:item.org}</td>${terminals.map(name=>`<td>${item.records.filter(row=>row.terminal===name).length}</td>`).join('')}<td><b>${item.records.length}</b></td><td><div class="app-actions">${hasChildren?`<button class="app-link" data-login-drill="${item.enterprise}">查看下级数据</button>`:'<button class="app-link" disabled title="当前机构无下级数据">查看下级数据</button>'}${upAction}<button class="app-link" data-login-detail-enterprise="${item.enterprise}" data-login-detail-org="${item.org}">查看明细</button></div></td></tr>`;
+        return `<tr><td>${item.enterprise}</td><td>${item.direct?`${item.enterprise}<span class="direct-person-note">（直属人员）</span>`:item.org}</td>${terminals.map(name=>`<td>${item.records.filter(row=>row.terminal===name).length}</td>`).join('')}<td><b>${item.records.length}</b></td><td class="app-action-cell"><div class="app-actions">${hasChildren?`<button class="app-link" data-login-drill="${item.enterprise}">查看下级数据</button>`:'<button class="app-link" disabled title="当前机构无下级数据">查看下级数据</button>'}${upAction}<button class="app-link" data-login-detail-enterprise="${item.enterprise}" data-login-detail-org="${item.org}">查看明细</button></div></td></tr>`;
       }).join('');
+      applyActionIcons(document.getElementById('loginOrgRows'));
+      applyOverflowTitles(document.getElementById('loginOrgRows').closest('table'));
       document.querySelectorAll('[data-login-drill]').forEach(btn=>btn.onclick=()=>selectLoginOrgLevel(btn.dataset.loginDrill));
       document.querySelectorAll('[data-login-up]').forEach(btn=>btn.onclick=()=>selectLoginOrgLevel(''));
       document.querySelectorAll('[data-login-detail-org]').forEach(btn=>btn.onclick=()=>setLoginView('records',btn.dataset.loginDetailEnterprise,btn.dataset.loginDetailOrg));
@@ -559,6 +1577,7 @@
       document.getElementById('content').classList.add('hide');
       document.getElementById('detailPage').classList.add('show');
       loginDrillEnterprise='';loginCurrentEnterprise='';loginCurrentOrg='';
+      loginOrgPageNo=1;
       setLoginView('org');window.scrollTo(0,0);
     }
     function closeDetails() {
@@ -568,7 +1587,9 @@
     function getApplicationRecords(includeOrg=true) {
       const keyword=document.getElementById('appSearch').value.trim().toLowerCase();
       const type=document.getElementById('appType').value;
-      return mockApplicationRecords[activeService].filter(row=>(!type||row.type===type)&&(!keyword||`${row.org} ${row.dept} ${row.name} ${row.id}`.toLowerCase().includes(keyword))&&(!includeOrg||((!appCurrentEnterprise||row.org===appCurrentEnterprise)&&(!appCurrentOrg||row.dept===appCurrentOrg))));
+      const status=document.getElementById('appStatus').value;
+      const config=applicationConfigs[activeService];
+      return mockApplicationRecords[activeService].filter(row=>(!type||row.type===type)&&(!status||!config.showSubmission||(status==='success'?row.submissionSuccess:!row.submissionSuccess))&&(!keyword||`${row.org} ${row.dept} ${row.name} ${row.id}`.toLowerCase().includes(keyword))&&(!includeOrg||((!appCurrentEnterprise||row.org===appCurrentEnterprise)&&(!appCurrentOrg||row.dept===appCurrentOrg))));
     }
     function getServiceTerms() {
       const config=applicationConfigs[activeService],isClick=config.mode==='click';
@@ -576,9 +1597,15 @@
     }
     function setApplicationView(view,org='',enterprise='') {
       if(applicationConfigs[activeService].orgOnly)view='org';
+      if(view==='org'&&appView!=='org')appOrgPageNo=1;
+      if(view==='records')appRecordPageNo=1;
       appView=view; appCurrentOrg=org; appCurrentEnterprise=enterprise;
       const terms=getServiceTerms();
-      document.querySelectorAll('.app-tab').forEach(btn=>btn.classList.toggle('active',btn.dataset.appView===view));
+      document.querySelectorAll('[data-app-view]').forEach(btn=>{
+        const active=btn.dataset.appView===view;
+        btn.classList.toggle('active',active);
+        btn.setAttribute('aria-selected',String(active));
+      });
       document.getElementById('recordTab').textContent=terms.detail;
       document.getElementById('recordTab').style.display=applicationConfigs[activeService].orgOnly?'none':'block';
       document.getElementById('appOrgView').classList.toggle('hide',view!=='org');
@@ -595,6 +1622,7 @@
     function selectOrgLevel(enterprise='') {
       appDrillEnterprise=enterprise;
       appCurrentEnterprise='';appCurrentOrg='';appView='org';
+      appOrgPageNo=1;
       closeOrgLevelMenu();renderApplicationPage();
     }
     function renderOrgLevelSwitch(enterprises) {
@@ -621,37 +1649,50 @@
       });
       renderOrgLevelSwitch([...enterpriseMap.keys()]);
       const orgRows=[...orgMap.values()].filter(item=>!appDrillEnterprise||item.enterprise===appDrillEnterprise).sort((a,b)=>b.records.length-a.records.length);
-      const typeHeads=config.showTypes===false?'':config.types.map(type=>`<th>${type}</th>`).join('');
-      document.getElementById('appOrgHead').innerHTML=`<th style="width:150px">所属企业</th><th style="width:190px">所属部门</th>${typeHeads}<th style="width:120px">${terms.total}</th><th style="width:100px">${terms.people}</th><th style="width:${config.orgOnly?240:300}px">操作</th>`;
+      const appOrgSize=Number(document.getElementById('appOrgPageSize').value);
+      appOrgPageNo=renderCompactPager('appOrg',orgRows.length,appOrgPageNo,appOrgSize,page=>{appOrgPageNo=page;renderApplicationPage()});
+      const pagedOrgRows=orgRows.slice((appOrgPageNo-1)*appOrgSize,appOrgPageNo*appOrgSize);
+      const typeWidth=config.types.length>5?96:132;
+      const actionWidth=config.orgOnly?220:300;
+      const typeHeads=config.showTypes===false?'':config.types.map(type=>`<th class="type-stat-col" style="width:${typeWidth}px" title="${type}">${type}</th>`).join('');
+      document.getElementById('appOrgHead').innerHTML=`<th style="width:130px">所属企业</th><th style="width:170px">所属部门</th>${typeHeads}<th style="width:104px">${terms.total}</th><th style="width:80px">${terms.people}</th><th class="app-action-col" style="width:${actionWidth}px">操作</th>`;
       document.getElementById('applicationSubtitle').textContent=appDrillEnterprise?`查看 ${appDrillEnterprise} 下级机构${terms.action}数据`:(config.orgSubtitle||`按机构统计${config.objectLabel}${terms.action}总数，可下钻查看下级机构`);
-      document.getElementById('appOrgRows').innerHTML=orgRows.length?orgRows.map(item=>{
+      document.getElementById('appOrgRows').innerHTML=pagedOrgRows.length?pagedOrgRows.map(item=>{
         const hasChildren=!appDrillEnterprise&&item.direct&&(enterpriseMap.get(item.enterprise)?.orgs.size||0)>1;
-        const typeCells=config.showTypes===false?'':config.types.map(type=>`<td>${item.records.filter(row=>row.type===type).length}</td>`).join('');
+        const typeCells=config.showTypes===false?'':config.types.map(type=>`<td class="type-stat-cell">${item.records.filter(row=>row.type===type).length}</td>`).join('');
         const actions=config.orgOnly
           ? `${hasChildren?`<button class="app-link" data-drill-enterprise="${item.enterprise}">查看下级数据</button>`:'<button class="app-link" disabled title="当前机构无下级数据">查看下级数据</button>'}${appDrillEnterprise?'<button class="app-link" data-up-level>查看上级数据</button>':'<button class="app-link" disabled title="当前已是最高层级">查看上级数据</button>'}`
           : `${hasChildren?`<button class="app-link" data-drill-enterprise="${item.enterprise}">查看下级数据</button>`:'<button class="app-link" disabled title="当前机构无下级数据">查看下级数据</button>'}${appDrillEnterprise?'<button class="app-link" data-up-level>查看上级数据</button>':'<button class="app-link" disabled title="当前已是最高层级">查看上级数据</button>'}<button class="app-link" data-enterprise="${item.enterprise}" data-org="${item.org}">查看明细</button>`;
-        return `<tr><td>${item.enterprise}</td><td>${item.direct?`${item.enterprise}<span class="direct-person-note">（直属人员）</span>`:item.org}</td>${typeCells}<td><b>${item.records.length}</b></td><td>${item.people.size}</td><td><div class="app-actions">${actions}</div></td></tr>`;
+        return `<tr><td>${item.enterprise}</td><td>${item.direct?`${item.enterprise}<span class="direct-person-note">（直属人员）</span>`:item.org}</td>${typeCells}<td><b>${item.records.length}</b></td><td>${item.people.size}</td><td class="app-action-cell"><div class="app-actions">${actions}</div></td></tr>`;
       }).join(''):'<tr><td class="app-empty" colspan="8">暂无符合条件的机构统计</td></tr>';
       const visibleDirectCount=orgRows.filter(item=>item.direct).reduce((sum,item)=>sum+item.records.length,0);
       document.getElementById('orgStatHint').textContent=`共 ${orgRows.length} 个机构，${orgRows.reduce((sum,item)=>sum+item.records.length,0)} 条${terms.record}，含 ${visibleDirectCount} 条直属人员${terms.record}`;
+      applyActionIcons(document.getElementById('appOrgRows'));
+      applyOverflowTitles(document.getElementById('appOrgRows').closest('table'));
       document.querySelectorAll('[data-drill-enterprise]').forEach(btn=>btn.onclick=()=>selectOrgLevel(btn.dataset.drillEnterprise));
       document.querySelectorAll('[data-up-level]').forEach(btn=>btn.onclick=()=>selectOrgLevel(''));
       document.querySelectorAll('.app-link[data-org]').forEach(btn=>btn.onclick=()=>setApplicationView('records',btn.dataset.org,btn.dataset.enterprise));
       const recordRows=getApplicationRecords(true);
+      const appRecordSize=Number(document.getElementById('appRecordPageSize').value);
+      appRecordPageNo=renderCompactPager('appRecord',recordRows.length,appRecordPageNo,appRecordSize,page=>{appRecordPageNo=page;renderApplicationPage()});
+      const pagedRecordRows=recordRows.slice((appRecordPageNo-1)*appRecordSize,appRecordPageNo*appRecordSize);
       document.getElementById('recordPanelTitle').textContent=appCurrentOrg?`${appCurrentEnterprise} / ${appCurrentOrg==='本级（直属人员）'?appCurrentEnterprise:appCurrentOrg}${terms.detail}`:appCurrentEnterprise?`${appCurrentEnterprise}全部机构${terms.detail}`:`全部${terms.detail}`;
-      document.getElementById('recordStatHint').textContent=`共 ${recordRows.length} 条`;
+      document.getElementById('recordStatHint').textContent=`共 ${recordRows.length} 条${terms.record}`;
       const typeRecordHead=config.showTypes===false?'':`<th style="width:180px">${config.objectLabel}</th>`;
       const submissionHead=config.showSubmission?'<th style="width:130px">提单是否成功</th><th style="width:150px">提单所耗时间</th>':'';
       document.getElementById('appRecordHead').innerHTML=`<th style="width:70px">序号</th><th style="width:140px">${terms.person}</th><th style="width:180px">企业</th><th style="width:200px">所属部门</th>${typeRecordHead}${submissionHead}<th style="width:190px">${terms.time}</th>`;
-      document.getElementById('appRecordRows').innerHTML=recordRows.length?recordRows.map((row,i)=>{const duration=row.durationSeconds>=60?`${Math.floor(row.durationSeconds/60)}分${row.durationSeconds%60}秒`:`${row.durationSeconds}秒`;return `<tr><td>${i+1}</td><td>${row.name}</td><td>${row.org}</td><td>${row.dept==='本级（直属人员）'?`${row.org}<span class="direct-person-note">（直属人员）</span>`:row.dept}</td>${config.showTypes===false?'':`<td>${row.type}</td>`}${config.showSubmission?`<td><span class="status-tag ${row.submissionSuccess?'approved':'rejected'}">${row.submissionSuccess?'是':'否'}</span></td><td>${duration}</td>`:''}<td>${row.submittedAt}</td></tr>`}).join(''):`<tr><td class="app-empty" colspan="${(config.showTypes===false?5:6)+(config.showSubmission?2:0)}">暂无符合条件的${terms.record}</td></tr>`;
+      document.getElementById('appRecordRows').innerHTML=pagedRecordRows.length?pagedRecordRows.map((row,i)=>{const duration=row.durationSeconds>=60?`${Math.floor(row.durationSeconds/60)}分${row.durationSeconds%60}秒`:`${row.durationSeconds}秒`;return `<tr><td>${(appRecordPageNo-1)*appRecordSize+i+1}</td><td>${row.name}</td><td>${row.org}</td><td>${row.dept==='本级（直属人员）'?`${row.org}<span class="direct-person-note">（直属人员）</span>`:row.dept}</td>${config.showTypes===false?'':`<td>${row.type}</td>`}${config.showSubmission?`<td><span class="status-tag ${row.submissionSuccess?'approved':'rejected'}">${row.submissionSuccess?'是':'否'}</span></td><td>${duration}</td>`:''}<td>${row.submittedAt}</td></tr>`}).join(''):`<tr><td class="app-empty" colspan="${(config.showTypes===false?5:6)+(config.showSubmission?2:0)}">暂无符合条件的${terms.record}</td></tr>`;
+      applyOverflowTitles(document.getElementById('appRecordRows').closest('table'));
     }
     function openApplication(service) {
-      activeService=service;appCurrentOrg='';appCurrentEnterprise='';appDrillEnterprise='';
+      activeService=service;appCurrentOrg='';appCurrentEnterprise='';appDrillEnterprise='';appOrgPageNo=1;appRecordPageNo=1;
       const config=applicationConfigs[service];
       const terms=getServiceTerms();
       document.getElementById('applicationTitle').textContent=config.detailTitle||(config.mode==='im'?config.title:`${config.title}${terms.action}统计`);
       document.getElementById('appType').innerHTML=`<option value="">全部${config.objectLabel}</option>${config.types.map(type=>`<option>${type}</option>`).join('')}`;
       document.getElementById('appType').style.display=config.showTypes===false?'none':'block';
+      document.getElementById('appStatus').value='';
+      document.getElementById('appStatus').style.display=config.showSubmission?'block':'none';
       document.getElementById('appSearch').placeholder=`搜索组织或${terms.person}`;
       document.getElementById('appSearch').value='';
       document.getElementById('detailPage').classList.remove('show');
@@ -665,7 +1706,7 @@
     }
     document.getElementById('range').querySelectorAll('button').forEach(btn => btn.onclick = () => {
       document.querySelector('#range .active').classList.remove('active'); btn.classList.add('active'); activeRange=btn.textContent;
-      const dateMap={'近一周':'2026-07-07  至  2026-07-13','近一月':'2026-06-14  至  2026-07-13','近一年':'2025-07-14  至  2026-07-13'};
+      const dateMap={'近一周':'2026-08-20  至  2026-08-26','近一月':'2026-07-27  至  2026-08-26','近一年':'2025-08-27  至  2026-08-26'};
       document.getElementById('dates').value=dateMap[activeRange]; renderTerminals(); showToast(`已切换为${activeRange}`);
     });
     document.getElementById('org').onchange = e => showToast(`已切换至${e.target.value}`);
@@ -687,6 +1728,7 @@
     document.getElementById('loginOrgLevelMenu').onclick=e=>e.stopPropagation();
     document.getElementById('loginOrgRoot').onclick=e=>{e.stopPropagation();selectLoginOrgLevel('')};
     document.getElementById('loginRefresh').onclick=()=>{renderLoginStats();showToast('登录统计已刷新')};
+    document.getElementById('loginRecordRefresh').onclick=()=>{detailPageNo=1;renderDetails();showToast('登录明细已刷新')};
     document.getElementById('backApplication').onclick = closeApplication;
     document.getElementById('backOrgStats').onclick = () => setApplicationView('org');
     document.getElementById('orgLevelTrigger').onclick = e => {
@@ -698,10 +1740,14 @@
     document.getElementById('orgLevelMenu').onclick=e=>e.stopPropagation();
     document.addEventListener('click',()=>{closeOrgLevelMenu();closeLoginOrgMenu()});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOrgLevelMenu();closeLoginOrgMenu()}});
-    document.querySelectorAll('.app-tab').forEach(btn=>btn.onclick=()=>{if(btn.dataset.appView==='org')appDrillEnterprise='';setApplicationView(btn.dataset.appView)});
-    ['appSearch','appType'].forEach(id=>document.getElementById(id).addEventListener(id==='appSearch'?'input':'change',renderApplicationPage));
+    document.querySelectorAll('[data-app-view]').forEach(btn=>btn.onclick=()=>{if(btn.dataset.appView==='org')appDrillEnterprise='';setApplicationView(btn.dataset.appView)});
+    ['appSearch','appType','appStatus'].forEach(id=>document.getElementById(id).addEventListener(id==='appSearch'?'input':'change',()=>{appOrgPageNo=1;appRecordPageNo=1;renderApplicationPage()}));
     document.getElementById('appRefresh').onclick=()=>{renderApplicationPage();showToast(`${getServiceTerms().action}统计已刷新`)};
+    document.getElementById('loginOrgPageSize').onchange=()=>{loginOrgPageNo=1;renderLoginStats()};
+    document.getElementById('appOrgPageSize').onchange=()=>{appOrgPageNo=1;renderApplicationPage()};
+    document.getElementById('appRecordPageSize').onchange=()=>{appRecordPageNo=1;renderApplicationPage()};
     document.querySelectorAll('.service-card[data-service],.ai-card[data-service],.im-action[data-service],.smart-action[data-service]').forEach(card=>{const open=()=>openApplication(card.dataset.service);card.onclick=open;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}});
+    document.querySelectorAll('.terminal-item[data-terminal]').forEach(item=>{const open=()=>{activeTerminal=item.dataset.terminal;openDetails()};item.onclick=open;item.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}});
     ['detailSearch','detailOrg','detailTerminal','detailDates','pageSize'].forEach(id => document.getElementById(id).addEventListener(id==='detailSearch'?'input':'change', () => { if(id==='detailOrg'){loginCurrentEnterprise='';loginCurrentOrg=''} detailPageNo=1; renderDetails(); }));
     Object.keys(mockApplicationRecords).forEach(key=>{
       const records=mockApplicationRecords[key];
@@ -709,7 +1755,7 @@
       if(total)total.textContent=records.length;
       if(users)users.textContent=new Set(records.map(row=>row.name)).size;
     });
-    renderTerminals(); renderChart();
+    renderTerminals(); if (document.getElementById('chart')) renderChart();
     if (location.hash === '#detail') openDetails();
     if (location.hash.startsWith('#service=')) {
       const params=new URLSearchParams(location.hash.slice(1)),service=params.get('service');
