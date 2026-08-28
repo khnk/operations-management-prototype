@@ -354,6 +354,11 @@
       grid-template-columns: minmax(340px, .78fr) minmax(470px, 1.03fr) minmax(470px, 1.03fr);
       gap: 14px;
     }
+    .service-system-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
     .bottom-grid {
       display: grid;
       grid-template-columns: minmax(360px, .65fr) 254px minmax(660px, 1.35fr);
@@ -445,6 +450,52 @@
     .business-card .value { font-size: 24px; }
     .business-card .metric:nth-child(2) > div { max-width: 82px; }
     .business-card .progress { width: 72px; height: 10px; margin-top: 6px; }
+    .overview-card {
+      min-height: 132px;
+      padding: 22px 24px 20px;
+      cursor: pointer;
+    }
+    .overview-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .overview-card-link {
+      color: var(--blue);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .overview-metrics {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .overview-metric {
+      min-width: 0;
+      padding: 0 28px;
+      border-right: 1px solid var(--line);
+    }
+    .overview-metric:first-child { padding-left: 4px; }
+    .overview-metric:last-child { border-right: 0; padding-right: 4px; }
+    .overview-label {
+      margin-bottom: 8px;
+      color: #526075;
+      white-space: nowrap;
+    }
+    .overview-value {
+      color: #0f1725;
+      font-size: 24px;
+      line-height: 1.05;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .overview-value small {
+      margin-left: 4px;
+      color: #0f1725;
+      font-size: 14px;
+      font-weight: 600;
+    }
     .progress {
       width: 122px;
       max-width: 100%;
@@ -828,6 +879,7 @@
     .app-detail-body { padding:16px 24px 24px; }
     .app-toolbar { min-height:32px; flex:1 1 auto; display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:0; flex-wrap:wrap; }
     .app-toolbar strong { display:none; }
+    #applicationPage .app-toolbar strong { display:block; margin-right:auto; color:var(--text); font-size:14px; font-weight:600; white-space:nowrap; }
     .org-level-switch { position:relative; margin-left:auto; }
     .org-level-trigger { position:relative; width:250px; height:32px; padding:0 36px 0 12px; display:flex; align-items:center; justify-content:flex-start; border:1px solid var(--line-dark); border-radius:4px; background:#fff; color:#3e4858; font-size:14px; }
     .org-level-trigger > span:first-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -857,7 +909,7 @@
     #appType { min-width:220px; }
     #appStatus { min-width:130px; }
     .org-level-switch + .app-filters { margin-left:0; }
-    .app-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin-bottom:18px; }
+    .app-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-bottom:18px; }
     .app-summary.hide { display:none; }
     .app-stat { position:relative; min-height:108px; overflow:hidden; border:1px solid #DDE6F4; background:linear-gradient(135deg,#fff 0%,#fff 58%,#F1F7FF 100%); border-radius:6px; padding:18px 18px 16px; box-shadow:0 2px 8px rgba(29,33,41,.06); }
     .app-stat::after { content:""; position:absolute; right:16px; top:16px; width:50px; height:50px; border-radius:12px; background:var(--blue-soft); opacity:.9; }
@@ -914,12 +966,14 @@
     .icon-btn { width:32px; height:32px; border:1px solid var(--line-dark); background:#fff; border-radius:4px; font-size:16px; color:#202631; }
     .icon-btn:hover { border-color:var(--blue-hover); color:var(--blue-hover); }
     .link-hint { border:0; background:transparent; padding:0; color:#273244; cursor:pointer; font:inherit; }
-    .terminal-item[data-terminal], .smart-action[data-service], .im-action[data-service], .ai-card[data-service] { cursor:pointer; }
+    .terminal-item[data-terminal], .smart-action[data-service], .im-action[data-service], .ai-card[data-service], .service-card[data-service] { cursor:pointer; }
     .terminal-item[data-terminal]:hover, .smart-action[data-service]:hover, .im-action[data-service]:hover { background:#f8fbff; }
     @media (max-width: 1480px) {
       .top-grid,
       .middle-grid,
+      .service-system-grid,
       .bottom-grid { grid-template-columns: 1fr; }
+      .app-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .terminal-list { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 18px; }
       .terminal-item:nth-child(3) { border-right: 0; }
       .resource-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -954,6 +1008,16 @@
       .metrics.three,
       .metrics.four,
       .metrics.two { grid-template-columns: 1fr; margin-top: 18px; }
+      .overview-metrics,
+      .app-summary { grid-template-columns: 1fr; }
+      .overview-metric,
+      .overview-metric:first-child,
+      .overview-metric:last-child {
+        padding: 12px 4px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .overview-metric:last-child { border-bottom: 0; }
       .metric,
       .metric:first-child,
       .metric:last-child {
@@ -1134,6 +1198,50 @@
                 <div class="metric"><div><div class="label">提单成功率</div><div class="value">0<small>%</small></div><div class="progress"><span style="width:0"></span></div></div></div>
                 <div class="metric"><div><div class="label">成功数</div><div class="value">0</div></div></div>
                 <div class="metric"><div><div class="label">平均时长</div><div class="value">0<small>秒</small></div></div></div>
+              </div>
+            </section>
+          </div>
+
+          <div class="service-system-grid">
+            <section class="card overview-card service-card" data-service="employeePortal" role="button" tabindex="0" aria-label="查看员工服务点击统计">
+              <div class="overview-card-head">
+                <h2>员工服务</h2>
+                <span class="overview-card-link">查看统计 &gt;</span>
+              </div>
+              <div class="overview-metrics">
+                <div class="overview-metric">
+                  <div class="overview-label">点击总数</div>
+                  <div class="overview-value" data-service-total="employeePortal">186</div>
+                </div>
+                <div class="overview-metric">
+                  <div class="overview-label">服务表单</div>
+                  <div class="overview-value">6<small>个</small></div>
+                </div>
+                <div class="overview-metric">
+                  <div class="overview-label">点击人数</div>
+                  <div class="overview-value" data-service-users="employeePortal">12</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card overview-card service-card" data-service="business" role="button" tabindex="0" aria-label="查看业务系统点击统计">
+              <div class="overview-card-head">
+                <h2>业务系统</h2>
+                <span class="overview-card-link">查看统计 &gt;</span>
+              </div>
+              <div class="overview-metrics">
+                <div class="overview-metric">
+                  <div class="overview-label">点击总数</div>
+                  <div class="overview-value" data-service-total="business">142</div>
+                </div>
+                <div class="overview-metric">
+                  <div class="overview-label">业务系统</div>
+                  <div class="overview-value">4<small>个</small></div>
+                </div>
+                <div class="overview-metric">
+                  <div class="overview-label">点击人数</div>
+                  <div class="overview-value" data-service-users="business">12</div>
+                </div>
               </div>
             </section>
           </div>
@@ -1382,11 +1490,78 @@
       imActive: { title:'IM - 用户活跃度', prefix:'IMY', count:13, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计用户活跃度，可下钻查看下级机构', showTypes:false, types:['用户活跃'], terms:{ action:'活跃', total:'用户活跃数', people:'活跃人数', person:'用户名', time:'活跃时间', detail:'活跃明细', record:'活跃记录' } },
       aiEmployee: { title:'AI+ 员工服务', prefix:'AIYG', count:78, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['请休假申请','加班申请','收入证明'] },
       travel: { title:'AI+ 自动化差旅', prefix:'CL', count:1239, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['出差申请','日常报账单','单人差旅报账单'] },
-      employeePortal: { title:'员工服务', prefix:'YG', count:186, mode:'click', objectLabel:'服务表单', types:['加班申请','相对方准入','请休假','报销单','出差申请','合同申请'] },
-      business: { title:'业务系统', prefix:'XT', count:142, mode:'click', objectLabel:'业务系统', types:['数字人力系统','财务共享系统','AI共享平台','法务系统'] }
+      employeePortal: { title:'员工服务', detailTitle:'员工服务点击统计', prefix:'YG', count:186, mode:'click', objectLabel:'服务表单', orgSubtitle:'按机构统计服务表单点击总数，可下钻查看下级机构', types:['加班申请','相对方准入','请休假','报销单','出差申请','合同申请'], terms:{ action:'点击', total:'点击总数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
+      business: { title:'业务系统', detailTitle:'业务系统点击统计', prefix:'XT', count:142, mode:'click', objectLabel:'业务系统', orgSubtitle:'按机构统计业务系统点击总数，可下钻查看下级机构', types:['数字人力系统','财务共享系统','AI共享平台','法务系统'], terms:{ action:'点击', total:'点击总数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } }
     };
+    const structuredApplicationStats = {
+      employeePortal: [
+        { org:'AI项目组', dept:'星网', people:['张三','赵六','李四'], order:['相对方准入','报销单','出差申请','合同申请','加班申请'], counts:{ '加班申请':16, '相对方准入':4, '请休假':0, '报销单':13, '出差申请':3, '合同申请':12 } },
+        { org:'国义招标', dept:'信息中心', people:['孙八','郑十一'], order:['相对方准入','出差申请','请休假','合同申请'], counts:{ '加班申请':0, '相对方准入':13, '请休假':3, '报销单':0, '出差申请':13, '合同申请':3 } },
+        { org:'集团总部', dept:'财务资金部', people:['陈十三'], order:['请休假','报销单'], counts:{ '加班申请':0, '相对方准入':0, '请休假':13, '报销单':3, '出差申请':0, '合同申请':0 } },
+        { org:'广新研究院', dept:'数字与人工智能部', people:['周九'], order:['加班申请','相对方准入'], counts:{ '加班申请':12, '相对方准入':3, '请休假':0, '报销单':0, '出差申请':0, '合同申请':0 } },
+        { org:'广新研究院', dept:'本级（直属人员）', people:['褚十四'], order:['相对方准入','请休假'], counts:{ '加班申请':0, '相对方准入':12, '请休假':3, '报销单':0, '出差申请':0, '合同申请':0 } },
+        { org:'香港投资', dept:'运营管理部', people:['钱七'], order:['请休假','报销单'], counts:{ '加班申请':0, '相对方准入':0, '请休假':12, '报销单':3, '出差申请':0, '合同申请':0 } },
+        { org:'集团总部', dept:'财务管理部', people:['冯十二'], order:['报销单','出差申请'], counts:{ '加班申请':0, '相对方准入':0, '请休假':0, '报销单':12, '出差申请':3, '合同申请':0 } },
+        { org:'集团总部', dept:'数智管理部', people:['王五'], order:['出差申请','合同申请'], counts:{ '加班申请':0, '相对方准入':0, '请休假':0, '报销单':0, '出差申请':12, '合同申请':3 } },
+        { org:'集团总部', dept:'资本投资中心', people:['吴十'], order:['合同申请','加班申请'], counts:{ '加班申请':3, '相对方准入':0, '请休假':0, '报销单':0, '出差申请':0, '合同申请':12 } }
+      ],
+      business: [
+        { org:'AI项目组', dept:'星网', people:['赵六','李四','张三'], order:['财务共享系统','AI共享平台','数字人力系统','法务系统'], counts:{ '数字人力系统':9, '财务共享系统':13, 'AI共享平台':12, '法务系统':2 } },
+        { org:'国义招标', dept:'信息中心', people:['郑十一','孙八'], order:['财务共享系统','AI共享平台','法务系统'], counts:{ '数字人力系统':0, '财务共享系统':10, 'AI共享平台':10, '法务系统':3 } },
+        { org:'广新研究院', dept:'数字与人工智能部', people:['周九'], order:['法务系统','数字人力系统'], counts:{ '数字人力系统':3, '财务共享系统':0, 'AI共享平台':0, '法务系统':9 } },
+        { org:'广新研究院', dept:'本级（直属人员）', people:['褚十四'], order:['数字人力系统','财务共享系统'], counts:{ '数字人力系统':10, '财务共享系统':2, 'AI共享平台':0, '法务系统':0 } },
+        { org:'香港投资', dept:'运营管理部', people:['钱七'], order:['财务共享系统','AI共享平台'], counts:{ '数字人力系统':0, '财务共享系统':9, 'AI共享平台':3, '法务系统':0 } },
+        { org:'集团总部', dept:'财务管理部', people:['冯十二'], order:['AI共享平台','法务系统'], counts:{ '数字人力系统':0, '财务共享系统':0, 'AI共享平台':10, '法务系统':2 } },
+        { org:'集团总部', dept:'数智管理部', people:['王五'], order:['法务系统','数字人力系统'], counts:{ '数字人力系统':2, '财务共享系统':0, 'AI共享平台':0, '法务系统':10 } },
+        { org:'集团总部', dept:'资本投资中心', people:['吴十'], order:['数字人力系统','财务共享系统'], counts:{ '数字人力系统':9, '财务共享系统':3, 'AI共享平台':0, '法务系统':0 } },
+        { org:'集团总部', dept:'财务资金部', people:['陈十三'], order:['法务系统','数字人力系统'], counts:{ '数字人力系统':2, '财务共享系统':0, 'AI共享平台':0, '法务系统':9 } }
+      ]
+    };
+    function expandStructuredTypeQueue(types, counts, order=[]) {
+      const remaining={};
+      const priority=[...order, ...types.filter(type=>!order.includes(type))];
+      const total=types.reduce((sum,type)=>{remaining[type]=counts[type]||0;return sum+remaining[type]},0);
+      const queue=[];
+      while(queue.length<total){
+        let added=false;
+        priority.forEach(type=>{ if(remaining[type]>0){ queue.push(type); remaining[type]-=1; added=true; } });
+        if(!added)break;
+      }
+      return queue;
+    }
+    function createStructuredApplicationRecords(key) {
+      const config=applicationConfigs[key];
+      const states=structuredApplicationStats[key].map((item,index)=>({ ...item, index, emitted:0, queue:expandStructuredTypeQueue(config.types,item.counts,item.order) }));
+      const records=[];
+      const total=states.reduce((sum,item)=>sum+item.queue.length,0);
+      while(records.length<total){
+        states.forEach(state=>{
+          if(!state.queue.length)return;
+          const type=state.queue.shift();
+          const people=state.people.length?state.people:[baseUsers[state.index%baseUsers.length][0]];
+          const recordIndex=records.length;
+          const day=String(18-(recordIndex%15)).padStart(2,'0');
+          const hour=String(8+(recordIndex%10)).padStart(2,'0');
+          const minute=String((recordIndex*7)%60).padStart(2,'0');
+          const second=String((recordIndex*11)%60).padStart(2,'0');
+          records.push({
+            id:`${config.prefix}202608${String(1001+recordIndex).padStart(4,'0')}`,
+            name:people[state.emitted%people.length],
+            org:state.org,
+            dept:state.dept,
+            type,
+            submissionSuccess:null,
+            durationSeconds:null,
+            submittedAt:`2026-08-${day} ${hour}:${minute}:${second}`
+          });
+          state.emitted+=1;
+        });
+      }
+      return records;
+    }
     function createApplicationRecords(key) {
       const config=applicationConfigs[key],offsets={agentClick:7,toolClick:8,qaCount:9,imSession:2,imActive:4,aiEmployee:1,travel:6,employeePortal:0,business:3};
+      if(structuredApplicationStats[key])return createStructuredApplicationRecords(key);
       return Array.from({length:config.count},(_,i)=>{
         const user=baseUsers[(i*5+offsets[key])%baseUsers.length];
         const submissionSuccess=key==='travel'?i%10<7:key==='aiEmployee'?false:null;
