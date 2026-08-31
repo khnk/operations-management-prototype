@@ -451,23 +451,80 @@
     .business-card .metric:nth-child(2) > div { max-width: 82px; }
     .business-card .progress { width: 72px; height: 10px; margin-top: 6px; }
     .overview-card {
-      min-height: 132px;
+      position: relative;
+      min-height: 160px;
       padding: 16px;
       cursor: pointer;
+      background: linear-gradient(135deg, #fff 0%, #fff 64%, #F3F8FF 100%);
+    }
+    .overview-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--blue);
+    }
+    .service-card[data-service="business"] {
+      background: linear-gradient(135deg, #fff 0%, #fff 64%, #F2FCF7 100%);
+    }
+    .service-card[data-service="business"]::before {
+      background: #00B42A;
     }
     .overview-card-head {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 14px;
     }
-    .overview-card-link {
+    .overview-title {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .overview-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
       color: var(--blue);
+      background: #E8F3FF;
+      flex: 0 0 auto;
+    }
+    .overview-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    .service-card[data-service="business"] .overview-icon {
+      color: #00B42A;
+      background: #E8FFEA;
+    }
+    .overview-subtitle {
+      margin-top: 4px;
+      color: #8b94a3;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .overview-card-link {
+      height: 24px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 4px;
+      color: var(--blue);
+      background: #F1F7FF;
       font-size: 14px;
       white-space: nowrap;
     }
+    .service-card[data-service="business"] .overview-card-link {
+      color: #00A870;
+      background: #ECFFF3;
+    }
     .overview-metrics {
-      margin-top: 28px;
+      margin-top: 20px;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -479,7 +536,7 @@
     .overview-metric:first-child { padding-left: 4px; }
     .overview-metric:last-child { border-right: 0; padding-right: 4px; }
     .overview-label {
-      margin-bottom: 8px;
+      margin-bottom: 7px;
       color: #526075;
       white-space: nowrap;
     }
@@ -495,6 +552,30 @@
       color: #0f1725;
       font-size: 14px;
       font-weight: 600;
+    }
+    .overview-foot {
+      height: 28px;
+      margin-top: 16px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-radius: 4px;
+      color: #526075;
+      background: rgba(232, 243, 255, .68);
+      font-size: 13px;
+    }
+    .overview-foot b {
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .service-card[data-service="business"] .overview-foot {
+      background: rgba(232, 255, 234, .72);
+    }
+    .service-card[data-service="business"] .overview-foot b {
+      color: #00A870;
     }
     .progress {
       width: 122px;
@@ -1205,7 +1286,15 @@
           <div class="service-system-grid">
             <section class="card overview-card service-card" data-service="employeePortal" role="button" tabindex="0" aria-label="查看员工服务点击统计">
               <div class="overview-card-head">
-                <h2>员工服务</h2>
+                <div class="overview-title">
+                  <span class="overview-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M7 6.5h10a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2"/><path d="M9 6.5V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M9 12h6M9 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </span>
+                  <div>
+                    <h2>员工服务</h2>
+                    <div class="overview-subtitle">服务表单点击概览</div>
+                  </div>
+                </div>
                 <span class="overview-card-link">查看统计 &gt;</span>
               </div>
               <div class="overview-metrics">
@@ -1222,11 +1311,20 @@
                   <div class="overview-value" data-service-users="employeePortal">12</div>
                 </div>
               </div>
+              <div class="overview-foot"><span>高频表单</span><b>相对方准入 32</b></div>
             </section>
 
             <section class="card overview-card service-card" data-service="business" role="button" tabindex="0" aria-label="查看业务系统点击统计">
               <div class="overview-card-head">
-                <h2>业务系统</h2>
+                <div class="overview-title">
+                  <span class="overview-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h5A1.5 1.5 0 0 1 12 5.5v5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 4 10.5v-5ZM12 13.5a1.5 1.5 0 0 1 1.5-1.5h5a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5h-5a1.5 1.5 0 0 1-1.5-1.5v-5ZM14 4h4a2 2 0 0 1 2 2v4M10 20H6a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  <div>
+                    <h2>业务系统</h2>
+                    <div class="overview-subtitle">业务系统点击概览</div>
+                  </div>
+                </div>
                 <span class="overview-card-link">查看统计 &gt;</span>
               </div>
               <div class="overview-metrics">
@@ -1243,6 +1341,7 @@
                   <div class="overview-value" data-service-users="business">12</div>
                 </div>
               </div>
+              <div class="overview-foot"><span>高频系统</span><b>财务共享系统 37</b></div>
             </section>
           </div>
 
