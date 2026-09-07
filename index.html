@@ -960,7 +960,7 @@
     .app-detail-body { padding:16px 24px 24px; }
     .app-toolbar { min-height:32px; flex:1 1 auto; display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:0; flex-wrap:wrap; }
     .app-toolbar strong { display:none; }
-    #applicationPage .app-toolbar strong { display:block; margin-right:auto; color:var(--text); font-size:14px; font-weight:600; white-space:nowrap; }
+    #applicationPage .app-toolbar strong { display:none; }
     .org-level-switch { position:relative; margin-left:auto; }
     .org-level-trigger { position:relative; width:250px; height:32px; padding:0 36px 0 12px; display:flex; align-items:center; justify-content:flex-start; border:1px solid var(--line-dark); border-radius:4px; background:#fff; color:#3e4858; font-size:14px; }
     .org-level-trigger > span:first-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -985,6 +985,11 @@
     .app-tab.active { color:#fff; border-right-color:var(--blue); background:var(--blue); font-weight:500; }
     .app-tab.active + .app-tab { border-left-color:var(--blue); }
     .app-filters { margin-left:auto; display:flex; gap:8px; }
+    #applicationPage #appDeptFilter { display:none!important; }
+    #orgLevelMenu { width:780px; grid-template-columns:200px 260px 320px; }
+    .app-date-filter { height:32px; display:none; align-items:center; gap:6px; padding:0 8px; border:1px solid var(--line-dark); border-radius:4px; background:#fff; color:var(--muted); white-space:nowrap; }
+    .app-date-filter input { width:118px; min-width:0; height:28px; padding:0 2px; border:0; outline:0; background:transparent; color:#526075; font:inherit; }
+    .app-date-filter:focus-within { border-color:var(--blue); box-shadow:0 0 0 2px rgba(0,109,255,.08); }
     .login-record-filters { display:none; flex:0 1 auto; justify-content:flex-end; }
     #appSearch { min-width:220px; }
     #appType { min-width:220px; }
@@ -1073,6 +1078,7 @@
       .filters { width:100%; justify-content:flex-start; flex-wrap:wrap; }
     }
     @media (max-width: 760px) {
+      #orgLevelMenu { width:min(780px,calc(100vw - 28px)); grid-template-columns:200px 260px 320px; overflow:auto; }
       .page { display: block; }
       .sidebar { display: none; }
       .topbar { gap: 10px; }
@@ -1500,8 +1506,9 @@
                   <div class="org-level-column" id="loginOrgLevelChildren"></div>
                 </div>
               </div>
+              <select class="field" id="loginDeptFilter" aria-label="所属部门"><option value="">全部部门</option></select>
               <button class="icon-btn" id="loginRefresh" title="刷新登录统计" aria-label="刷新登录统计">↻</button>
-              <div class="filters login-record-filters" id="loginRecordFilters"><button class="app-back-org" id="backLoginOrg" type="button" hidden>‹ 返回组织统计</button><input class="field search-field" id="detailSearch" placeholder="搜索访问编号、用户名或 IP" aria-label="搜索明细"><select class="field" id="detailOrg" aria-label="所属企业"><option value="">全部企业</option><option>AI项目组</option><option>集团总部</option><option>香港投资</option><option>国义招标</option><option>广新研究院</option></select><select class="field" id="detailTerminal" aria-label="终端类型"><option value="">全部终端</option><option>iOS</option><option>安卓</option><option>鸿蒙</option><option>Web</option><option>Windows</option><option>macOS</option></select><input class="field" id="detailDates" value="2026-06-14  至  2026-07-13" aria-label="日期范围"><button class="icon-btn" id="loginRecordRefresh" title="刷新登录明细" aria-label="刷新登录明细">↻</button></div>
+              <div class="filters login-record-filters" id="loginRecordFilters"><button class="app-back-org" id="backLoginOrg" type="button" hidden>‹ 返回组织统计</button><input class="field search-field" id="detailSearch" placeholder="搜索访问编号、用户名或 IP" aria-label="搜索明细"><select class="field" id="detailOrg" aria-label="所属企业"><option value="">全部企业</option><option>AI项目组</option><option>集团总部</option><option>香港投资</option><option>国义招标</option><option>广新研究院</option></select><select class="field" id="detailDept" aria-label="所属部门"><option value="">全部部门</option></select><select class="field" id="detailTerminal" aria-label="终端类型"><option value="">全部终端</option><option>iOS</option><option>安卓</option><option>鸿蒙</option><option>Web</option><option>Windows</option><option>macOS</option></select><input class="field" id="detailDates" value="2026-06-14  至  2026-07-13" aria-label="日期范围"><button class="icon-btn" id="loginRecordRefresh" title="刷新登录明细" aria-label="刷新登录明细">↻</button></div>
             </div>
           </div>
           <div class="app-summary" id="loginSummary"></div>
@@ -1529,9 +1536,10 @@
                 <div class="org-level-menu" id="orgLevelMenu">
                   <div class="org-level-column"><button class="org-level-option active" data-org-level="root"><span class="radio"></span><span>广新集团</span><span class="next">›</span></button></div>
                   <div class="org-level-column" id="orgLevelChildren"></div>
+                  <div class="org-level-column" id="orgDeptChildren"><div class="org-level-option" style="color:#98a2b3">请先选择企业</div></div>
                 </div>
               </div>
-              <div class="app-filters"><input class="field" id="appSearch" placeholder="搜索组织或点击人" aria-label="搜索点击记录"><select class="field" id="appType" aria-label="点击对象"></select><select class="field" id="appStatus" aria-label="成功失败状态"><option value="">全部结果</option><option value="success">成功</option><option value="failure">失败</option></select><button class="icon-btn" id="appRefresh" title="刷新统计" aria-label="刷新统计">↻</button></div>
+              <div class="app-filters"><select class="field" id="appDeptFilter" aria-label="所属部门"><option value="">全部部门</option></select><input class="field" id="appSearch" placeholder="搜索组织或点击人" aria-label="搜索点击记录"><select class="field" id="appType" aria-label="点击对象"></select><select class="field" id="appStatus" aria-label="成功失败状态"><option value="">全部结果</option><option value="success">成功</option><option value="failure">失败</option></select><div class="app-date-filter" id="appDateFilter" aria-label="创建时间段"><input type="date" id="appCreatedStart" aria-label="创建开始日期"><span>至</span><input type="date" id="appCreatedEnd" aria-label="创建结束日期"></div><button class="icon-btn" id="appRefresh" title="刷新统计" aria-label="刷新统计">↻</button></div>
             </div>
           </div>
           <div class="app-summary" id="appSummary"></div>
@@ -1585,7 +1593,7 @@
       agentClick: { title:'智能体点击数', detailTitle:'智能体点击数统计', prefix:'ZNT', count:3885, mode:'click', orgOnly:true, objectLabel:'智能体名称', orgSubtitle:'按机构统计不同智能体点击数，可查看上下级机构', types:['广新智能助手','AI+财务自动差旅','智能问答','法智小新','智能摘要','智能数据'], terms:{ action:'点击', total:'智能体点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
       toolClick: { title:'工具点击数', detailTitle:'工具点击数统计', prefix:'GJ', count:38, mode:'click', orgOnly:true, objectLabel:'工具名称', orgSubtitle:'按机构统计不同工具点击数，可查看上下级机构', types:['知识库检索','文件解析','数据查询','表单生成'], terms:{ action:'点击', total:'工具点击数', people:'点击人数', person:'点击人', time:'点击时间', detail:'点击明细', record:'点击记录' } },
       qaCount: { title:'对话/问答次数', detailTitle:'对话/问答次数统计', prefix:'WD', count:1176, mode:'click', orgOnly:true, objectLabel:'问答场景', orgSubtitle:'按机构统计不同问答场景次数，可查看上下级机构', types:['智能问答','政策咨询','财务问答','制度查询'], terms:{ action:'问答', total:'对话/问答次数', people:'使用人数', person:'用户', time:'发起时间', detail:'问答明细', record:'问答记录' } },
-      imSession: { title:'IM - 发起会话次数', prefix:'IMH', count:5351, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计发起会话次数，可下钻查看下级机构', showTypes:false, types:['发起会话'], terms:{ action:'会话', total:'发起会话次数', people:'发起人数', person:'发起人', time:'创建时间', detail:'会话明细', record:'会话记录' } },
+      imSession: { title:'IM - 发起会话次数', prefix:'IMH', count:5351, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计发起会话次数，可下钻查看下级机构', showTypes:false, showCreatedDate:true, searchNameOnly:true, searchPlaceholder:'搜索发起人', types:['发起会话'], terms:{ action:'会话', total:'发起会话次数', people:'发起人数', person:'发起人', time:'创建时间', detail:'会话明细', record:'会话记录' } },
       imActive: { title:'IM - 用户活跃度', prefix:'IMY', count:13, mode:'im', objectLabel:'统计类型', orgSubtitle:'按机构统计用户活跃度，可下钻查看下级机构', showTypes:false, types:['用户活跃'], terms:{ action:'活跃', total:'用户活跃数', people:'活跃人数', person:'用户名', time:'活跃时间', detail:'活跃明细', record:'活跃记录' } },
       aiEmployee: { title:'AI+ 员工服务', prefix:'AIYG', count:78, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['请休假申请','加班申请','收入证明'] },
       travel: { title:'AI+ 自动化差旅', prefix:'CL', count:1239, mode:'application', showSubmission:true, objectLabel:'单据类型', types:['出差申请','日常报账单','单人差旅报账单'] },
@@ -1771,8 +1779,15 @@
     function getFilteredRecords() {
       const keyword = document.getElementById('detailSearch').value.trim().toLowerCase();
       const org = document.getElementById('detailOrg').value;
+      const dept = document.getElementById('detailDept').value;
       const terminal = document.getElementById('detailTerminal').value;
-      return mockLoginRecords.filter(row => (!keyword || `${row.id} ${row.name} ${row.ip}`.toLowerCase().includes(keyword)) && (!org || row.org === org) && (!terminal || row.terminal === terminal) && (!loginCurrentEnterprise || row.org===loginCurrentEnterprise) && (!loginCurrentOrg || row.dept===loginCurrentOrg));
+      return mockLoginRecords.filter(row => (!keyword || `${row.id} ${row.name} ${row.ip}`.toLowerCase().includes(keyword)) && (!org || row.org === org) && (!dept || row.dept === dept) && (!terminal || row.terminal === terminal) && (!loginCurrentEnterprise || row.org===loginCurrentEnterprise) && (!loginCurrentOrg || row.dept===loginCurrentOrg));
+    }
+    function populateLoginDetailDepartments() {
+      const enterprise=document.getElementById('detailOrg').value,current=document.getElementById('detailDept').value;
+      const depts=[...new Set(mockLoginRecords.filter(row=>!enterprise||row.org===enterprise).map(row=>row.dept))].sort();
+      document.getElementById('detailDept').innerHTML=`<option value="">全部部门</option>${depts.map(dept=>`<option>${dept}</option>`).join('')}`;
+      if(depts.includes(current))document.getElementById('detailDept').value=current;
     }
     function renderDetails() {
       const filtered = getFilteredRecords();
@@ -1808,20 +1823,29 @@
       document.getElementById('loginRecordView').classList.toggle('show',view==='records');
       document.getElementById('loginSummary').classList.toggle('hide',view==='records');
       document.getElementById('loginOrgLevelSwitch').style.display=view==='org'?'block':'none';
+      document.getElementById('loginDeptFilter').style.display=view==='org'?'block':'none';
       document.getElementById('loginRefresh').style.display=view==='org'?'inline-block':'none';
       document.getElementById('loginRecordFilters').style.display=view==='records'?'flex':'none';
       if(view==='records'){
         document.getElementById('detailOrg').value=enterprise||'';
+        populateLoginDetailDepartments();
+        document.getElementById('detailDept').value=org||'';
         detailPageNo=1;renderDetails();
       } else renderLoginStats();
     }
     function selectLoginOrgLevel(enterprise='') {
       loginDrillEnterprise=enterprise;loginCurrentEnterprise='';loginCurrentOrg='';
+      document.getElementById('loginDeptFilter').value='';
       loginOrgPageNo=1;
       closeLoginOrgMenu();setLoginView('org');
     }
     function renderLoginStats() {
-      const terminals=terminalNames,records=mockLoginRecords;
+      const terminals=terminalNames,availableRecords=mockLoginRecords.filter(row=>!loginDrillEnterprise||row.org===loginDrillEnterprise);
+      const deptSelect=document.getElementById('loginDeptFilter'),currentDept=deptSelect.value;
+      const departments=[...new Set(availableRecords.map(row=>row.dept))].sort();
+      deptSelect.innerHTML=`<option value="">全部部门</option>${departments.map(dept=>`<option>${dept}</option>`).join('')}`;
+      if(departments.includes(currentDept))deptSelect.value=currentDept;
+      const records=availableRecords.filter(row=>!deptSelect.value||row.dept===deptSelect.value);
       document.getElementById('loginSummary').innerHTML=[['登录总数',records.length],...terminals.map(name=>[name,records.filter(row=>row.terminal===name).length])].map(item=>`<div class="app-stat"><div class="app-stat-label">${item[0]}</div><div class="app-stat-value">${item[1]}</div></div>`).join('');
       const orgMap=new Map(),enterpriseMap=new Map();
       records.forEach(row=>{
@@ -1870,8 +1894,12 @@
       const keyword=document.getElementById('appSearch').value.trim().toLowerCase();
       const type=document.getElementById('appType').value;
       const status=document.getElementById('appStatus').value;
+      const createdStart=document.getElementById('appCreatedStart').value;
+      const createdEnd=document.getElementById('appCreatedEnd').value;
+      const deptFilter=document.getElementById('appDeptFilter').value;
       const config=applicationConfigs[activeService];
-      return mockApplicationRecords[activeService].filter(row=>(!type||row.type===type)&&(!status||!config.showSubmission||(status==='success'?row.submissionSuccess:!row.submissionSuccess))&&(!keyword||`${row.org} ${row.dept} ${row.name} ${row.id}`.toLowerCase().includes(keyword))&&(!includeOrg||((!appCurrentEnterprise||row.org===appCurrentEnterprise)&&(!appCurrentOrg||row.dept===appCurrentOrg))));
+      const hasCreatedDate=config.showSubmission||config.showCreatedDate;
+      return mockApplicationRecords[activeService].filter(row=>{const createdDate=row.submittedAt.slice(0,10),keywordSource=(config.showSubmission||config.searchNameOnly)?row.name:`${row.org} ${row.dept} ${row.name} ${row.id}`;return (!type||row.type===type)&&(!status||!config.showSubmission||(status==='success'?row.submissionSuccess:!row.submissionSuccess))&&(!hasCreatedDate||(!createdStart||createdDate>=createdStart)&&(!createdEnd||createdDate<=createdEnd))&&(!appDrillEnterprise||row.org===appDrillEnterprise)&&(!deptFilter||row.dept===deptFilter)&&(!keyword||keywordSource.toLowerCase().includes(keyword))&&(!includeOrg||((!appCurrentEnterprise||row.org===appCurrentEnterprise)&&(!appCurrentOrg||row.dept===appCurrentOrg)))});
     }
     function getServiceTerms() {
       const config=applicationConfigs[activeService],isClick=config.mode==='click';
@@ -1904,20 +1932,32 @@
     function selectOrgLevel(enterprise='') {
       appDrillEnterprise=enterprise;
       appCurrentEnterprise='';appCurrentOrg='';appView='org';
+      document.getElementById('appDeptFilter').value='';
       appOrgPageNo=1;
       closeOrgLevelMenu();renderApplicationPage();
     }
     function renderOrgLevelSwitch(enterprises) {
-      document.getElementById('orgLevelLabel').textContent=appDrillEnterprise||'广新集团';
+      const selectedDept=document.getElementById('appDeptFilter').value;
+      document.getElementById('orgLevelLabel').textContent=selectedDept?(selectedDept==='本级（直属人员）'?`${appDrillEnterprise}（直属人员）`:selectedDept):(appDrillEnterprise||'广新集团');
       const rootOption=document.querySelector('[data-org-level="root"]');
       rootOption.classList.toggle('active',!appDrillEnterprise);
       rootOption.onclick=e=>{e.stopPropagation();selectOrgLevel('')};
       document.getElementById('orgLevelChildren').innerHTML=enterprises.map(enterprise=>`<button class="org-level-option ${appDrillEnterprise===enterprise?'active':''}" data-level-enterprise="${enterprise}"><span class="radio"></span><span>${enterprise}</span><span class="next">›</span></button>`).join('');
-      document.querySelectorAll('[data-level-enterprise]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();selectOrgLevel(btn.dataset.levelEnterprise)});
+      const renderDepartments=enterprise=>{
+        const departments=[...new Set(mockApplicationRecords[activeService].filter(row=>row.org===enterprise).map(row=>row.dept))].sort();
+        document.getElementById('orgDeptChildren').innerHTML=`<button class="org-level-option ${appDrillEnterprise===enterprise&&!selectedDept?'active':''}" data-level-dept=""><span class="radio"></span><span>全部部门</span></button>${departments.map(dept=>`<button class="org-level-option ${selectedDept===dept?'active':''}" data-level-dept="${dept}"><span class="radio"></span><span>${dept==='本级（直属人员）'?'直属人员':dept}</span></button>`).join('')}`;
+        document.querySelectorAll('[data-level-dept]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();appDrillEnterprise=enterprise;document.getElementById('appDeptFilter').value=btn.dataset.levelDept;appOrgPageNo=1;appRecordPageNo=1;closeOrgLevelMenu();renderApplicationPage()});
+      };
+      document.querySelectorAll('[data-level-enterprise]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();appDrillEnterprise=btn.dataset.levelEnterprise;document.getElementById('appDeptFilter').value='';document.querySelectorAll('[data-level-enterprise]').forEach(item=>item.classList.toggle('active',item===btn));document.querySelector('[data-org-level="root"]').classList.remove('active');document.getElementById('orgLevelLabel').textContent=appDrillEnterprise;renderDepartments(appDrillEnterprise)});
+      if(appDrillEnterprise)renderDepartments(appDrillEnterprise);else document.getElementById('orgDeptChildren').innerHTML='<div class="org-level-option" style="color:#98a2b3">请先选择企业</div>';
     }
     function renderApplicationPage() {
       const config=applicationConfigs[activeService];
       const terms=getServiceTerms();
+      const deptSelect=document.getElementById('appDeptFilter'),currentDept=deptSelect.value;
+      const availableDepts=[...new Set(mockApplicationRecords[activeService].filter(row=>!appDrillEnterprise||row.org===appDrillEnterprise).map(row=>row.dept))].sort();
+      deptSelect.innerHTML=`<option value="">全部部门</option>${availableDepts.map(dept=>`<option>${dept}</option>`).join('')}`;
+      if(availableDepts.includes(currentDept))deptSelect.value=currentDept;
       const allFiltered=getApplicationRecords(false);
       const typeStats=config.showTypes===false?[]:config.types.map(type=>[type,allFiltered.filter(row=>row.type===type).length]);
       document.getElementById('appSummary').innerHTML=[[terms.total,allFiltered.length],...typeStats].map(item=>`<div class="app-stat"><div class="app-stat-label">${item[0]}</div><div class="app-stat-value">${item[1]}</div></div>`).join('');
@@ -1975,7 +2015,15 @@
       document.getElementById('appType').style.display=config.showTypes===false?'none':'block';
       document.getElementById('appStatus').value='';
       document.getElementById('appStatus').style.display=config.showSubmission?'block':'none';
-      document.getElementById('appSearch').placeholder=`搜索组织或${terms.person}`;
+      document.getElementById('appDeptFilter').value='';
+      const globalDates=document.getElementById('dates').value.split('至').map(value=>value.trim());
+      const hasCreatedDate=config.showSubmission||config.showCreatedDate;
+      document.getElementById('appDateFilter').style.display=hasCreatedDate?'flex':'none';
+      document.getElementById('appCreatedStart').value=hasCreatedDate?(globalDates[0]||''):'';
+      document.getElementById('appCreatedEnd').value=hasCreatedDate?(globalDates[1]||''):'';
+      const searchPlaceholder=config.searchPlaceholder||(config.showSubmission?'搜索申请人':`搜索组织或${terms.person}`);
+      document.getElementById('appSearch').placeholder=searchPlaceholder;
+      document.getElementById('appSearch').setAttribute('aria-label',searchPlaceholder);
       document.getElementById('appSearch').value='';
       document.getElementById('detailPage').classList.remove('show');
       document.getElementById('content').classList.add('hide');
@@ -2023,14 +2071,15 @@
     document.addEventListener('click',()=>{closeOrgLevelMenu();closeLoginOrgMenu()});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOrgLevelMenu();closeLoginOrgMenu()}});
     document.querySelectorAll('[data-app-view]').forEach(btn=>btn.onclick=()=>{if(btn.dataset.appView==='org')appDrillEnterprise='';setApplicationView(btn.dataset.appView)});
-    ['appSearch','appType','appStatus'].forEach(id=>document.getElementById(id).addEventListener(id==='appSearch'?'input':'change',()=>{appOrgPageNo=1;appRecordPageNo=1;renderApplicationPage()}));
+    ['appSearch','appType','appStatus','appCreatedStart','appCreatedEnd','appDeptFilter'].forEach(id=>document.getElementById(id).addEventListener(id==='appSearch'?'input':'change',()=>{const start=document.getElementById('appCreatedStart').value,end=document.getElementById('appCreatedEnd').value;if(start&&end&&start>end){showToast('结束日期不能早于开始日期');return}appOrgPageNo=1;appRecordPageNo=1;renderApplicationPage()}));
     document.getElementById('appRefresh').onclick=()=>{renderApplicationPage();showToast(`${getServiceTerms().action}统计已刷新`)};
     document.getElementById('loginOrgPageSize').onchange=()=>{loginOrgPageNo=1;renderLoginStats()};
     document.getElementById('appOrgPageSize').onchange=()=>{appOrgPageNo=1;renderApplicationPage()};
     document.getElementById('appRecordPageSize').onchange=()=>{appRecordPageNo=1;renderApplicationPage()};
     document.querySelectorAll('.service-card[data-service],.ai-card[data-service],.im-action[data-service],.smart-action[data-service]').forEach(card=>{const open=()=>openApplication(card.dataset.service);card.onclick=open;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}});
     document.querySelectorAll('.terminal-item[data-terminal]').forEach(item=>{const open=()=>{activeTerminal=item.dataset.terminal;openDetails()};item.onclick=open;item.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}});
-    ['detailSearch','detailOrg','detailTerminal','detailDates','pageSize'].forEach(id => document.getElementById(id).addEventListener(id==='detailSearch'?'input':'change', () => { if(id==='detailOrg'){loginCurrentEnterprise='';loginCurrentOrg=''} detailPageNo=1; renderDetails(); }));
+    document.getElementById('loginDeptFilter').onchange=()=>{loginOrgPageNo=1;renderLoginStats()};
+    ['detailSearch','detailOrg','detailDept','detailTerminal','detailDates','pageSize'].forEach(id => document.getElementById(id).addEventListener(id==='detailSearch'?'input':'change', () => { if(id==='detailOrg'||id==='detailDept'){loginCurrentEnterprise='';loginCurrentOrg=''} if(id==='detailOrg')populateLoginDetailDepartments(); detailPageNo=1; renderDetails(); }));
     Object.keys(mockApplicationRecords).forEach(key=>{
       const records=mockApplicationRecords[key];
       const total=document.querySelector(`[data-service-total="${key}"]`),users=document.querySelector(`[data-service-users="${key}"]`);
