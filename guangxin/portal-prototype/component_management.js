@@ -1,0 +1,9 @@
+const priorComponentManagementSide=side;
+side=function(){priorComponentManagementSide();if(isAdmin()){const b=document.createElement('button');b.className='nav'+(route==='componentManagement'?' active':'');b.innerHTML='<span>'+uiIcon('appstore')+'</span>门户组件管理';b.onclick=()=>go('componentManagement');$('sidebar').insertBefore(b,$('sidebar').querySelector('.sidebar-foot'))}};
+function componentManagementView(){return titlebar('门户组件管理','维护门户组件，选择列表中的组件查看样式预览',`<button class="primary" onclick="portalDraft=null;createComponent()">＋ 新增组件</button>`)+`<section class="card"><div class="component-library-grid"><section><h3 style="margin-bottom:12px">组件列表</h3><div id="componentLibraryList" class="stack"></div></section><section class="component-library-preview"><div class="row" style="margin-bottom:15px"><h3>组件预览</h3><button id="editLibraryComponent" onclick="portalDraft=null;createComponent(librarySelectedComponent)">编辑组件</button></div><div id="componentLibraryInfo"></div><div id="componentLibraryPreview"></div></section></div></section>`}
+const priorComponentManagementRender=render;
+render=function(){if(route==='componentManagement'){if(!isAdmin()){route='home';return priorComponentManagementRender()}side();$('main').innerHTML=componentManagementView();if(!state.customComponents.some(c=>c.id===librarySelectedComponent))librarySelectedComponent=state.customComponents[0]?.id||'';renderComponentLibrary();return}priorComponentManagementRender()};
+const oldComponentLibrary=componentLibrary;
+componentLibrary=function(){if(route==='componentManagement'){closeDialog(true);render();return}oldComponentLibrary()};
+const componentManagementStyle=document.createElement('style');componentManagementStyle.textContent='main>.card .component-library-grid{min-height:500px}main #componentLibraryList{max-height:650px;overflow:auto}';document.head.appendChild(componentManagementStyle);
+render();

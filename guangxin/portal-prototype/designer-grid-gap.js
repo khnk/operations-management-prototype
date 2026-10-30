@@ -1,0 +1,9 @@
+function designerGridGap(p=portalDraft){return Math.max(8,Math.min(24,Number(p?.globalStyle?.gap)||12))}
+const beforeGapDesignerRender=renderPortalDesigner;
+function applyDesignerGridGaps(){const canvas=$('portalDesigner')?.querySelector('.grid-designer-canvas');if(!canvas)return;const gap=designerGridGap();for(const el of canvas.querySelectorAll('[data-designer-id]')){const r=gridRect(el.dataset.designerId);el.style.left=r.x*DESIGN_GRID+gap/2+'px';el.style.top=r.y*DESIGN_GRID+gap/2+'px';el.style.width=Math.max(40,r.w*DESIGN_GRID-gap)+'px';el.style.height=Math.max(40,r.h*DESIGN_GRID-gap)+'px'}canvas.style.setProperty('--grid-gap',gap+'px')}
+renderPortalDesigner=function(){beforeGapDesignerRender();applyDesignerGridGaps()};
+const beforeGapResizeMove=moveDesignerResize;
+moveDesignerResize=function(e){beforeGapResizeMove(e);if(designerResize?.w)applyDesignerGridGaps()};
+const beforeGapApplyStyles=applyDesignerCardStyles;
+applyDesignerCardStyles=function(root,p){beforeGapApplyStyles(root,p);if(root.id==='portalDesigner'||!p.gridLayout||innerWidth<700)return;const gap=designerGridGap(p);for(const el of root.querySelectorAll('.dashboard [data-widget]')){const r=p.gridLayout[el.dataset.widget];if(!r)continue;el.style.left=r.x*DESIGN_GRID+gap/2+'px';el.style.top=r.y*DESIGN_GRID+gap/2+'px';el.style.width=Math.max(40,r.w*DESIGN_GRID-gap)+'px';el.style.height=Math.max(40,r.h*DESIGN_GRID-gap)+'px'}};
+const gapStyle=document.createElement('style');gapStyle.textContent='.grid-designer-canvas{background-image:none!important}.grid-designer-canvas:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(to right,#f7faff var(--grid-gap,12px),transparent var(--grid-gap,12px)),linear-gradient(to bottom,#f7faff var(--grid-gap,12px),transparent var(--grid-gap,12px));background-size:40px 40px;background-color:#e8effa55}.grid-designer-canvas .designer-widget{border-radius:9px}';document.head.appendChild(gapStyle);

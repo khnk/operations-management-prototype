@@ -1,0 +1,9 @@
+function gridOverlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function packDesignerGrid(preferredId=''){const ids=designerIds(),cols=Math.min(48,Math.max(20,...ids.map(id=>gridRect(id).x+gridRect(id).w)));for(const id of ids)gridRect(id).w=Math.min(48,gridRect(id).w);const ordered=ids.map((id,i)=>({id,i,...gridRect(id)})).sort((a,b)=>a.y-b.y||a.x-b.x||a.i-b.i);const placed=[];for(const item of ordered){const r=gridRect(item.id);let spot=null;const limit=placed.reduce((n,p)=>Math.max(n,p.y+p.h),0)+r.h+1;for(let y=0;y<=limit&&!spot;y++){for(let x=0;x<=cols-r.w;x++){const candidate={x,y,w:r.w,h:r.h};if(!placed.some(p=>gridOverlap(candidate,p))){spot=candidate;break}}}if(spot){Object.assign(r,spot);placed.push({...spot,id:item.id})}}return placed}
+const beforePackingRender=renderPortalDesigner;
+renderPortalDesigner=function(){if(designerDevice==='web')packDesignerGrid();beforePackingRender()};
+const beforePackingMove=moveDesignerResize;
+moveDesignerResize=function(e){beforePackingMove(e);if(!designerResize?.w)return;packDesignerGrid(designerResize.id);const canvas=designerResize.el.parentElement;for(const el of canvas.querySelectorAll('[data-designer-id]')){const r=gridRect(el.dataset.designerId);el.style.left=r.x*DESIGN_GRID+'px';el.style.top=r.y*DESIGN_GRID+'px';el.style.width=r.w*DESIGN_GRID+'px';el.style.height=r.h*DESIGN_GRID+'px'}const ext=gridExtent();canvas.style.width=ext.w*DESIGN_GRID+'px';canvas.style.height=ext.h*DESIGN_GRID+'px'};
+const originalGridDropPacking=gridDrop;
+gridDrop=function(e,canvas){originalGridDropPacking(e,canvas)};
+const packingStyle=document.createElement('style');packingStyle.textContent='.grid-designer-canvas .designer-widget{border-radius:0}.grid-designer-canvas .designer-widget:not(.resizing){transition:left .12s,top .12s}.grid-designer-canvas .designer-widget-render{box-sizing:border-box}';document.head.appendChild(packingStyle);
