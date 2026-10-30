@@ -1,0 +1,3 @@
+(()=>{
+window.ExternalSystemsManager={open(root){root.innerHTML='<div id="externalSystemsLoading" style="padding:35px;color:#7183a1">正在加载外部系统管理…</div><iframe id="externalSystemsFrame" title="外部系统管理" style="width:100%;height:calc(100vh - 140px);min-height:500px;border:0;visibility:hidden" src="portal-prototype/index.html?externalSystems=1"></iframe>';const frame=root.querySelector('iframe');function ready(e){if(e.source!==frame.contentWindow||e.data?.type!=='gx-external-systems-ready')return;root.querySelector('#externalSystemsLoading')?.remove();frame.style.visibility='visible';window.removeEventListener('message',ready)}window.addEventListener('message',ready);}};
+})();
