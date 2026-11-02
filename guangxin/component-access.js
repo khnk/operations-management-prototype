@@ -2,6 +2,7 @@
 const catalog=[['reminders','AI每日简报'],['todo','统一待办'],['schedule','我的日程'],['mail','邮件提醒'],['approval','我的审批'],['apps','常用功能'],['portalBanner','门户轮播横幅'],['portalNews','AI智能资讯'],['portalGroup','集团综合资讯'],['portalReminders','门户智能提醒'],['portalNotices','最新通知'],['portalAnnouncements','最新公告'],['hotTracking','AI热点追踪与事件演化']];
 const systemCatalog=catalog.slice();function refreshCatalog(){catalog.splice(0,catalog.length,...systemCatalog.filter(([t])=>ComponentRegistry.enabled(t)),...ComponentRegistry.custom().filter(c=>ComponentRegistry.enabled(c.id)).map(c=>[c.id,c.name]))}refreshCatalog();
 const key='gx-component-permissions-v1';const base={user:{grade:'普通员工',post:'综合管理',company:'集团总部'},rules:[{name:'全员基础组件',grade:'全部',post:'全部',company:'全部',components:['todo','schedule','mail','apps','portalNews','portalNotices','portalAnnouncements']},{name:'管理层组件',grade:'管理层',post:'全部',company:'全部',components:['reminders','approval','portalReminders','hotTracking']},{name:'总部综合管理组件',grade:'全部',post:'综合管理',company:'集团总部',components:catalog.map(c=>c[0])}]};let state;try{state=JSON.parse(localStorage.getItem(key))}catch{}if(!state||!Array.isArray(state.rules)||!state.user)state=base;
+state.rules.forEach(r=>r.id??='group_'+crypto.randomUUID());localStorage.setItem(key,JSON.stringify(state));
 const dimensions=['grade','post','company','role'];
 state.user.role=state.user.role||'普通用户';
 state.rules.forEach(r=>{if(!Array.isArray(r.conditions))r.conditions=[Object.fromEntries(dimensions.map(k=>[k,!r[k]||r[k]==='全部'?[]:[r[k]]]))]});
