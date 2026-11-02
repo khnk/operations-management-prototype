@@ -8,12 +8,12 @@
   const storeKey = () => designer.classList.contains('mobile-device') ? 'portal-mobile-grid-v2' : 'portal-web-grid-v2';
   const mobile = () => designer.classList.contains('mobile-device');
   let positions = [], drag = null, placeholder = null, ghost = null, layer = null, floor = null, draftCache = {}, refreshQueued = false, pointerPending = null, suppressClick = false, resizing = null, mobilePending = null, mobileDrag = null;
-  function read(key) { try { const value = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } }
+  function read(key) { try { const value = JSON.parse(localStorage.getItem(ComponentAccess.storageKey(key)) || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } }
   // Apply the requested new initial brief proportions once to existing drafts.
   // Subsequent user resizes remain untouched.
   try{if(localStorage.getItem('daily-brief-initial-size-v3')!=='done'){
     const key='portal-web-grid-v2',rows=read(key);
-    if(rows.length)localStorage.setItem(key,JSON.stringify(rows.map(p=>p.type==='reminders'?{...p,w:3,h:5,x:Math.min(p.x||0,9)}:p)));
+    if(rows.length)localStorage.setItem(ComponentAccess.storageKey(key),JSON.stringify(rows.map(p=>p.type==='reminders'?{...p,w:3,h:5,x:Math.min(p.x||0,9)}:p)));
     localStorage.setItem('daily-brief-initial-size-v3','done');
   }}catch{}
   const style = document.createElement('style');
@@ -115,7 +115,8 @@
   }
   function measure(el,w,root=canvas) {const preset=window.PortalDefaults?.grid.find(p=>p.type===el.dataset.type);if(preset)return preset.h;const oldHeight=el.style.height, oldCol=el.style.gridColumn, oldRow=el.style.gridRow; el.style.setProperty('grid-column',`1 / span ${w}`,'important');el.style.setProperty('grid-row','1','important');el.style.setProperty('height','auto','important');const height=Math.max(el.scrollHeight,el.getBoundingClientRect().height,150);el.style.height=oldHeight;el.style.gridColumn=oldCol;el.style.gridRow=oldRow;return Math.max(2,Math.ceil((height+GAP)/(ROW+GAP))); }
   function keyRows(nodes) { const counts={};return nodes.map(el=>{const t=el.dataset.type;return t+':'+(counts[t]=(counts[t]||0)+1);}); }
-  function persisted(root,key) { const nodes=cards(root), stored=(key==='portal-web-grid-v2'&&!ComponentAccess.hasPersonalWork()&&ComponentAccess.initial('work')?.grid?.length)?ComponentAccess.initial('work').grid:read(key),rows=stored.length?stored:(key==='portal-web-grid-v2'?window.PortalDefaults?.grid||[]:[]), keys=keyRows(nodes);return nodes.map((el,i)=>{const found=rows.find(p=>p.key===keys[i]&&p.type===el.dataset.type);return found||null;}); }
+  function persisted(root,key) {const nodes=cards(root),initial=key==='portal-web-grid-v2'&&!ComponentAccess.hasPersonalWork()?ComponentAccess.initial('work'):null;let stored=read(key);if(initial){if(initial.grid?.length)stored=initial.grid;else{const cols=Math.max(1,Math.min(3,Number(initial.columns)||3)),w=12/cols;stored=initial.components.map((type,i)=>({type,key:type+':1',x:(i%cols)*w,y:Math.floor(i/cols)*4,w,h:4}))}}const rows=stored.length?stored:(key==='portal-web-grid-v2'?window.PortalDefaults?.grid||[]:[]),keys=keyRows(nodes);return nodes.map((el,i)=>rows.find(p=>(!p.key||p.key===keys[i])&&p.type===el.dataset.type)||null); }
+
   function refresh() {
     refreshQueued=false;if(drag||resizing||designer.hidden)return;
     if(mobile()){if(layer)layer.remove();if(floor)floor.remove();layer=floor=null;renderMobileTitles();return;}
@@ -251,8 +252,8 @@
   document.addEventListener('dragend',()=>finish(false),true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(drag)finish(false);if(resizing)finishResize(false);if(mobileDrag)finishMobile(false);mobilePending=null;}});
   function syncPublished(){const root=document.querySelector('#savedWorkGrid');if(!root)return;const nodes=cards(root),saved=persisted(root,'portal-web-grid-v2');let placed=[];nodes.forEach((el,i)=>{let p;if(saved[i])p=normalize(saved[i],el.dataset.type);else{p={type:el.dataset.type,w:width(el.dataset.type),h:measure(el,width(el.dataset.type),root),x:0,y:0};outer:for(let y=0;y<1000;y++)for(let x=0;x<=12-p.w;x++){p.x=x;p.y=y;if(!placed.some(q=>overlap(p,q)))break outer;}}while(placed.some(q=>overlap(p,q)))p.y++;placed.push(p);});placed=compactGrid(placed);nodes.forEach((el,i)=>place(el,placed[i]));}
-  document.querySelector('#ldSave').addEventListener('click',()=>{if(mobile())return;remember();localStorage.setItem(storeKey(),JSON.stringify(positions));syncPublished();});
-  document.querySelector('#ldReset').addEventListener('click',()=>{draftCache[storeKey()]={};localStorage.removeItem(storeKey());queue();});
+  document.querySelector('#ldSave').addEventListener('click',()=>{if(mobile())return;remember();localStorage.setItem(ComponentAccess.storageKey(storeKey()),JSON.stringify(positions));syncPublished();});
+  document.querySelector('#ldReset').addEventListener('click',()=>{draftCache[storeKey()]={};localStorage.removeItem(ComponentAccess.storageKey(storeKey()));queue();});
   document.querySelector('#editWork').addEventListener('click',()=>{draftCache={};canvas.scrollTop=0;queue();});
   document.querySelector('#ldBack').addEventListener('click',()=>{draftCache={};});
   window.PortalLayoutGrid={snapshot(){return mobile()?[]:positions.map(p=>({...p}))},set(list){

@@ -1,6 +1,6 @@
 (() => {
   const designer=document.querySelector('#layoutDesigner'),canvas=document.querySelector('#ldCanvas');
-  const KEY='portal-ai-design-style-v1',defaults={theme:'default',density:'comfortable',corners:'rounded'};
+  const KEY=ComponentAccess.storageKey('portal-ai-design-style-v1'),defaults={theme:'default',density:'comfortable',corners:'rounded'};
   let stored={};try{stored=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch{}
   let draftStyles={},sessions={},sequence=0;
   function session(){return sessions[device()]??={plans:[],selected:null,undos:[],active:null}}
