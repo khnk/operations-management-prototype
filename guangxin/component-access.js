@@ -8,6 +8,7 @@ state.user.role=state.user.role||'普通用户';
 state.rules.forEach(r=>{if(!Array.isArray(r.conditions))r.conditions=[Object.fromEntries(dimensions.map(k=>[k,!r[k]||r[k]==='全部'?[]:[r[k]]]))]});
 const gradeMap={'普通员工':'B3','主管':'B8','管理层':'B12'};state.user.grade=gradeMap[state.user.grade]||state.user.grade;state.rules.forEach(r=>r.conditions.forEach(c=>c.grade=(c.grade||[]).map(v=>gradeMap[v]||v)));
 const companyMap={'集团总部':'广新集团总部','子公司 A':'佛塑科技','子公司 B':'星湖科技','子公司 C':'国义招标'};state.user.company=companyMap[state.user.company]||state.user.company;state.rules.forEach(r=>r.conditions.forEach(c=>c.company=(c.company||[]).map(v=>companyMap[v]||v)));
+const groupNames={'全员基础组件':'全体员工','管理层组件':'管理层人员','总部综合管理组件':'总部综合管理人员','示例账号 · 集团门户':'示例账号 · 集团人员组','示例账号 · 业务门户':'示例账号 · 业务人员组'};state.rules.forEach(r=>{if(groupNames[r.name])r.name=groupNames[r.name]});
 // One-time example-account authorization; later administrator changes remain untouched.
 state.user.name??='张嘉嘉';state.user.account??='DEMO-ZJJ';
 if(!localStorage.getItem('gx-demo-account-portals-v1')){
@@ -15,7 +16,7 @@ if(!localStorage.getItem('gx-demo-account-portals-v1')){
  // Keep existing portal layouts when initializing the shared portal catalogue.
  state.rules.forEach(r=>Object.entries(r.portals||{}).forEach(([kind,p])=>{p.portalId??='portal_'+crypto.randomUUID();if(!definitions.some(d=>d.id===p.portalId))definitions.push({id:p.portalId,name:(kind==='work'?'工作台':'信息门户')+' · '+r.name,kind,config:structuredClone(p)})}));
  const kinds=['work','info'],prefixes=['集团','业务'];
- prefixes.forEach((prefix,i)=>{const id='demo-zjj-group-'+i;let group=state.rules.find(r=>r.id===id);if(!group){group={id,name:'示例账号 · '+prefix+'门户',conditions:[Object.fromEntries(dimensions.map(k=>[k,Array.isArray(state.user[k])?state.user[k].slice():[state.user[k]]]))],components:catalog.map(([t])=>t),portals:{}};state.rules.push(group)}
+ prefixes.forEach((prefix,i)=>{const id='demo-zjj-group-'+i;let group=state.rules.find(r=>r.id===id);if(!group){group={id,name:'示例账号 · '+prefix+'人员组',conditions:[Object.fromEntries(dimensions.map(k=>[k,Array.isArray(state.user[k])?state.user[k].slice():[state.user[k]]]))],components:catalog.map(([t])=>t),portals:{}};state.rules.push(group)}
  kinds.forEach(kind=>{const portalId='demo-zjj-'+kind+'-'+i;const components=(kind==='work'?(i?['todo','approval','apps','schedule']:['todo','reminders','portalReminders','apps','mail','schedule']):(i?['portalNews','portalGroup','portalNotices']:['portalBanner','portalNews','portalGroup','portalReminders','portalNotices','portalAnnouncements'])).filter(t=>catalog.some(c=>c[0]===t));const config={enabled:true,priority:200+i,columns:kind==='work'?3:2,theme:i?'blue':'default',density:'comfortable',corners:'rounded',components,portalId};if(!definitions.some(d=>d.id===portalId))definitions.push({id:portalId,name:prefix+(kind==='work'?'工作台':'信息门户'),kind,config:structuredClone(config)});group.portals[kind]=config});});
  localStorage.setItem('gx-managed-portals-v1',JSON.stringify(definitions));localStorage.setItem('gx-demo-account-portals-v1','1');
 }
