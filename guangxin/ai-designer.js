@@ -10,7 +10,7 @@
   const currentStyle=()=>({...defaults,...stored[device()],...window.PortalPresetDesignContext?.style,...draftStyles[device()]});
   function styleRoot(root,value){root.dataset.portalTheme=value.theme;root.dataset.portalDensity=value.density;root.dataset.portalCorners=value.corners;}
   function syncStyle(){styleRoot(canvas,currentStyle());}
-  styleRoot(document.querySelector('.work'),{...defaults,...stored.web});syncStyle();
+  styleRoot(document.querySelector('.work'),ComponentAccess.hasPersonalWork()?{...defaults,...stored.web}:{...defaults,...ComponentAccess.initial('work')});syncStyle();
   function snap(){return {state:PortalDesigner.snapshot(),grid:PortalLayoutGrid.snapshot(),style:currentStyle()};}
   function makePlan(text){
     const base=snap(),list=base.state.components.slice(),grid=base.grid.map(p=>({...p})),styles={...base.style},notes=[],unhandled=[];
@@ -92,11 +92,11 @@
   };
   undo.onclick=()=>{const s=session(),previous=s.undos.pop();if(!previous)return;restore(previous.snapshot);s.active=previous.active;refreshHistory();status.textContent='已恢复上次应用前的画布'+(s.undos.length?'，还可撤销 '+s.undos.length+' 步。':'，暂无更多可撤销记录。');};
   function clearSession(){draftStyles={};sessions={};sequence=0;refreshHistory();status.textContent='';drawer.hidden=true;syncStyle();}
-  window.PortalAIDesignSession={clear:clearSession};
+  window.PortalAIDesignSession={clear:clearSession,refreshPublishedStyle(){const initial=ComponentAccess.initial('work');styleRoot(document.querySelector('.work'),ComponentAccess.hasPersonalWork()?{...defaults,...stored.web}:{...defaults,...initial})}};
   document.querySelector('#editWork').addEventListener('click',clearSession);
   document.querySelector('#ldBack').addEventListener('click',clearSession);
   document.querySelectorAll('[data-device]').forEach(b=>b.addEventListener('click',()=>{syncStyle();refreshHistory();status.textContent='已切换终端，显示当前终端的方案与撤销记录。';}));
-  document.querySelector('#ldReset').addEventListener('click',()=>{draftStyles[device()]={...defaults};syncStyle();session().undos=[];session().active=null;refreshHistory();status.textContent='布局与样式已重置，历史方案保留，撤销记录已清空。';});
+  document.querySelector('#ldReset').addEventListener('click',()=>{draftStyles[device()]={...defaults,...ComponentAccess.initial('work')};syncStyle();session().undos=[];session().active=null;refreshHistory();status.textContent='布局与样式已重置，历史方案保留，撤销记录已清空。';});
   document.querySelector('#ldSave').addEventListener('click',()=>{stored[device()]=currentStyle();try{localStorage.setItem(KEY,JSON.stringify(stored))}catch{}if(device()==='web')styleRoot(document.querySelector('.work'),stored.web);clearSession();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden){drawer.hidden=true;e.stopPropagation();}});
 })();

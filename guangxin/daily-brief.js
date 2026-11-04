@@ -6,7 +6,7 @@
     {name:'用户出差申请',time:'2026-10-28 07:40',text:'CC20261028001已审批通过：2026-10-29至10-30，广州前往济南，事由为客户方案交流。审批通过不代表交通住宿已全部预订。',status:'已获取'},
     {name:'酒店、机票与高铁预订',time:'2026-10-28 07:50',text:'去程机票：10-29 08:30–11:15，广州白云至济南遥墙，已出票。返程高铁：10-30 09:20–19:50，济南西至广州南，已出票。另有11-03至11-05杭州酒店订单，不属于本次济南出差；尚未查到济南住宿记录。订单为示例快照，未接入实时运行与退改信息。',status:'部分待核实'},
     {name:'用户未报销发票',time:'2026-10-28 07:35',text:'3张发票状态为未报销：10-20住宿¥800.00，10-21交通¥386.00，10-21餐饮¥100.00，共¥1,286.00。当前未获取报销政策与提交期限，也未确认这些票据对应哪次出差。',status:'已获取'},
-    {name:'用户收到的邮件',time:'2026-10-28 07:55',text:'客户邮件07:25送达，主题为“请确认合作方案”，正文请求确认方案内容；酒店邮件昨天16:30送达，主题为“入住信息核对”，请求核对11月杭州行程的入住人信息。正文未写明确回复期限。AI提取的回复请求不是已创建的待办。',status:'已获取'},
+    {name:'用户收到的邮件（仅基础信息）',time:'2026-10-28 07:55',text:'客户邮件07:25送达，主题为“请确认合作方案”，正文请求确认方案内容；酒店邮件昨天16:30送达，主题为“入住信息核对”，请求核对11月杭州行程的入住人信息。正文未写明确回复期限。AI提取的回复请求不是已创建的待办。',status:'已获取'},
     {name:'用户日程',time:'2026-10-28 07:50',text:'今天14:00–15:00项目专题会，地点为3楼会议室A；15:30–16:00客户方案沟通，方式为线上会议。当前两场日程时间未重叠；未获取会议附件及准备要求，不能据此判断会前材料是否齐全。',status:'已获取'}
   ];
   const versions={
@@ -20,9 +20,11 @@
     const v=structuredClone(versions[role]||versions.manager);
     if(history)return `<section class="daily-brief db-history-copy"><header class="db-document-head"><div><h4>早安，我的晨间简报</h4><p>2026 年 10 月 27 日 · 星期二</p></div><small>示例归档 · 信息截至 08:00</small></header><p class="db-greeting">早上好，${esc(v.name)}。</p><div class="db-intro">昨天的重点是查看明日到期的待办，并核对后天济南出差的申请和预订。以下为独立历史示例快照，不使用今日邮件与日程更新。</div><h4 class="db-section-title">今天最重要的事</h4>${item(['两项待办将于10月28日到期，提前查看办理要求','历史待办快照显示，合同审批与市场活动费用确认分别在10月28日11:00、17:00到期，记录状态为待处理。',[],'提前确认办理内容和权限，为明日处理留出时间。'])}<h4 class="db-section-title">相关变化</h4>${item(['10月29日济南出差已审批通过，预订仍需核对','历史申请快照显示出差日期为10月29日至30日；该快照未附完整预订关联记录，不能判断机票与住宿是否齐备。',[],'查看当时的原始订单后再确认。'])}<h4 class="db-section-title">安排与提醒</h4><p>历史快照未提供当日日程、邮件与发票详情；未获取不代表没有会议、待回复邮件或未报销票据。</p><footer class="db-footnote">历史示例依据：10月27日07:45的待办快照、07:40的出差申请快照。仅含上述两类虚构记录，其余来源未提供；不引用今日快照。</footer></section>`;
     const tasks=UnifiedTasks.tasks();const taskNames=tasks.map(t=>t.title).join('；');
-    v.intro=(tasks.length?'您当前有 '+tasks.length+' 项待办：'+taskNames+'。请在办理页面确认具体要求。':'当前待办已处理完毕。')+'下午会议、出差预订、邮件及票据情况请结合下方来源记录核实。';
+    v.intro=(tasks.length?'您当前有 '+tasks.length+' 项待办：'+taskNames+'。请在办理页面确认具体要求。':'当前待办已处理完毕。')+'下午会议、出差预订及票据情况请结合下方来源记录核实；邮件仅提供基础信息，不分析正文。';
     v.important[0]=[tasks.length?'当前有 '+tasks.length+' 项待办，请按办理要求处理':'当前暂无待处理事项',tasks.length?taskNames+'。以上条目与统一待办组件一致，来源记录未提供明确截止时间，不据此判断是否逾期。':'当前待办列表为空，已处理事项可在统一待办的“已办”中查看。',[1],'点击“查看来源”中的编号待办进入处理界面。'];
     v.changes[1]=['两笔出差费用尚未报销，合计¥'+BriefInvoices.total().toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}),BriefInvoices.records.map(r=>r.id+'：机票'+r.flights+'张，酒店'+r.nights+'晚，合计¥'+(r.flightAmount+r.hotelAmount).toFixed(2)).join('；')+'。',[4],'查看关联出差申请并核对费用明细后，按实际业务办理报销。'];
+    v.changes[0]=['收到两封邮件，请按需前往邮箱查看','仅获取邮件主题“请确认合作方案”“入住信息核对”、发件人及接收时间。未获取邮件正文，无法判断具体要求、涉及行程或回复期限。',[5],'如需确认内容，请前往邮箱阅读原文；简报不基于邮件主题推断业务结论。'];
+    v.plan=['下午有两场日程安排，请核对会议详情','14:00–15:00为项目专题会，地点为3楼会议室A；15:30–16:00为线上客户方案沟通。会议附件及准备要求未获取。',[6],'请查看日程详情确认准备事项。'];
     v.last='待办以统一待办列表的最新状态为准；办理后可在“已办”中查看。其他事项请核对原始记录后再作判断。';
     return `<section class="daily-brief" data-brief-role="${esc(role)}"><header class="db-component-head"><h3><span>✦</span> AI 每日简报</h3><nav aria-label="简报辅助操作"><button type="button" data-brief="sources">查看来源</button><button type="button" data-brief="history">历史简报</button></nav></header><article class="db-document"><header class="db-document-head"><div><h4>早安，我的晨间简报</h4><p>2026 年 10 月 28 日 · 星期三 <span>约 5 分钟读完</span></p></div><div class="db-cutoff"><b>虚构业务样稿</b><small>信息截至 08:00 · 北京时间</small></div></header><p class="db-greeting">早上好，${esc(v.name)}。</p><div class="db-intro">${esc(v.intro)}</div><h4 class="db-section-title">今天最重要的事</h4>${v.important.map(item).join('')}<h4 class="db-section-title">与您相关的事项</h4>${v.changes.map(item).join('')}<h4 class="db-section-title">今天的安排与准备</h4>${item(v.plan)}<aside class="db-final"><b>最后提醒</b><p>${esc(v.last)}</p></aside><footer class="db-footnote"><p>来源索引：〔1〕用户待办；〔2〕出差申请；〔3〕酒店、机票与高铁预订（济南酒店待核实）；〔4〕未报销发票；〔5〕收到的邮件；〔6〕用户日程。</p><p>以上名称、业务与引用均为虚构示例。AI 建议为分析推断，不代表已确认业务结论。实际内容按当前用户的身份、岗位、部门及数据权限生成；未获取的信息不作“没有问题”的结论。</p></footer></article></section>`;
   }

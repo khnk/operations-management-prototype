@@ -253,10 +253,10 @@
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(drag)finish(false);if(resizing)finishResize(false);if(mobileDrag)finishMobile(false);mobilePending=null;}});
   function syncPublished(){const root=document.querySelector('#savedWorkGrid');if(!root)return;const nodes=cards(root),saved=persisted(root,'portal-web-grid-v2');let placed=[];nodes.forEach((el,i)=>{let p;if(saved[i])p=normalize(saved[i],el.dataset.type);else{p={type:el.dataset.type,w:width(el.dataset.type),h:measure(el,width(el.dataset.type),root),x:0,y:0};outer:for(let y=0;y<1000;y++)for(let x=0;x<=12-p.w;x++){p.x=x;p.y=y;if(!placed.some(q=>overlap(p,q)))break outer;}}while(placed.some(q=>overlap(p,q)))p.y++;placed.push(p);});placed=compactGrid(placed);nodes.forEach((el,i)=>place(el,placed[i]));}
   document.querySelector('#ldSave').addEventListener('click',()=>{if(mobile())return;remember();localStorage.setItem(ComponentAccess.storageKey(storeKey()),JSON.stringify(positions));syncPublished();});
-  document.querySelector('#ldReset').addEventListener('click',()=>{draftCache[storeKey()]={};localStorage.removeItem(ComponentAccess.storageKey(storeKey()));queue();});
+  document.querySelector('#ldReset').addEventListener('click',()=>{draftCache[storeKey()]={};const initial=ComponentAccess.initial('work');if(initial){const cols=Math.max(1,Math.min(3,Number(initial.columns)||3)),w=12/cols;PortalLayoutGrid.set(initial.grid?.length?initial.grid:initial.components.map((type,i)=>({type,x:i%cols*w,y:Math.floor(i/cols)*4,w,h:4})));}else queue();});
   document.querySelector('#editWork').addEventListener('click',()=>{draftCache={};canvas.scrollTop=0;queue();});
   document.querySelector('#ldBack').addEventListener('click',()=>{draftCache={};});
-  window.PortalLayoutGrid={snapshot(){return mobile()?[]:positions.map(p=>({...p}))},set(list){
+  window.PortalLayoutGrid={refreshPublished:syncPublished,snapshot(){return mobile()?[]:positions.map(p=>({...p}))},set(list){
     if(mobile())return;refresh();const nodes=cards(),keys=keyRows(nodes);
     positions=nodes.map((el,i)=>{const entry=list.find(p=>p.type===el.dataset.type)||positions[i];return {...normalize(entry,el.dataset.type),key:keys[i]}});
     positions=compactGrid(positions);remember();nodes.forEach((el,i)=>place(el,positions[i]));paintCells();
