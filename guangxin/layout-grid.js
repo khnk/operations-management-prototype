@@ -197,12 +197,12 @@
   }
   function moveGhost(x,y){if(!drag||!ghost)return;ghost.style.left=(x-drag.offX)+'px';ghost.style.top=(y-drag.offY)+'px';}
   canvas.addEventListener('dragstart',e=>{const card=e.target.closest('.ld-widget');if(!card||mobile())return;start(e,card,cards().indexOf(card),card.dataset.type);},true);
-  library.addEventListener('dragstart',e=>{const source=e.target.closest('.ld-source');if(source&&!mobile())start(e,source,-1,types[[...library.children].indexOf(source)]);},true);
+  library.addEventListener('dragstart',e=>{const source=e.target.closest('.ld-source');if(source&&!mobile())start(e,source,-1,source.dataset.type);},true);
   function update(x,y){if(!drag)return;const r=canvas.getBoundingClientRect(),m=metrics();drag.lastX=x;drag.lastY=y;moveGhost(x,y);drag.valid=x>=r.left+m.left&&x<r.right&&y>=r.top&&y<=r.bottom;if(!drag.valid){placeholder.style.visibility='hidden';return;}placeholder.style.visibility='visible';drag.target.x=Math.max(0,Math.min(12-drag.target.w,Math.round((x-r.left-m.left-drag.offX)/m.col)));drag.target.y=Math.max(0,Math.round((y-r.top+canvas.scrollTop-m.top-drag.offY)/(ROW+GAP)));positions=settle(drag.base,drag.target,drag.index);cards().forEach((el,i)=>{if(i!==drag.index)place(el,positions[i]);});place(placeholder,drag.target);paintCells(positions);}
   document.addEventListener('dragenter',e=>{if(drag){e.preventDefault();e.dataTransfer.dropEffect=drag.index<0?'copy':'move';}},true);
   document.addEventListener('dragover',e=>{if(!drag)return;e.preventDefault();e.stopImmediatePropagation();e.dataTransfer.dropEffect=drag.index<0?'copy':'move';update(e.clientX,e.clientY);},true);
   let scrollFrame;function scroll(){if(drag&&drag.valid){const r=canvas.getBoundingClientRect();const delta=drag.lastY>r.bottom-75?16:drag.lastY<r.top+60?-16:0;if(delta){canvas.scrollTop+=delta;update(drag.lastX,drag.lastY);}}scrollFrame=requestAnimationFrame(scroll);}scroll();
-  function commitDrop(){if(!drag)return;if(!drag.valid){finish(false);return;}const state=drag;if(state.index<0){let n=1;while(positions.some(p=>p.key===state.type+':'+n))n++;positions.push({...state.target,key:state.type+':'+n});remember();finish(true);library.children[types.indexOf(state.type)].click();}else{remember();finish(true);}}
+  function commitDrop(){if(!drag)return;if(!drag.valid){finish(false);return;}const state=drag;if(state.index<0){let n=1;while(positions.some(p=>p.key===state.type+':'+n))n++;positions.push({...state.target,key:state.type+':'+n});remember();finish(true);[...library.querySelectorAll('.ld-source')].find(source=>source.dataset.type===state.type)?.click();}else{remember();finish(true);}}
   document.addEventListener('drop',e=>{if(!drag)return;e.preventDefault();e.stopImmediatePropagation();commitDrop();},true);
   // Use pointer movement rather than relying on native HTML drag initiation:
   // nested buttons, text and images must drag the whole component too.
@@ -224,7 +224,7 @@
     const p=pointerPending;
     if(!drag&&Math.hypot(e.clientX-p.x,e.clientY-p.y)<5)return;
     e.preventDefault();e.stopImmediatePropagation();
-    if(!drag){p.el.setPointerCapture(e.pointerId);const index=p.card?cards().indexOf(p.el):-1,type=p.card?p.el.dataset.type:types[[...library.children].indexOf(p.el)];
+    if(!drag){p.el.setPointerCapture(e.pointerId);const index=p.card?cards().indexOf(p.el):-1,type=p.card?p.el.dataset.type:p.el.dataset.type;
       start({clientX:p.x,clientY:p.y,stopImmediatePropagation(){},dataTransfer:{setData(){},setDragImage(){}}},p.el,index,type);
     }
     update(e.clientX,e.clientY);
