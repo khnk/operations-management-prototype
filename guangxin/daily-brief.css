@@ -2,3 +2,5 @@
 .daily-brief .db-item p{color:#536077}.daily-brief .db-greeting{color:#4a566b;margin:0 0 12px}.daily-brief .db-document-head p{color:#929cac;margin-top:4px}.daily-brief .db-final p{color:#536077}.daily-brief .db-footnote p{color:#98a2b2}
 
 .db-task-sources{padding-left:25px;margin:14px 0}.db-task-sources li{padding-left:5px;margin:12px 0;color:#536d91}.db-task-sources button{display:block;width:100%;text-align:left;background:#f6f8fc;border:1px solid #e3eaf5;border-radius:8px;padding:13px;cursor:pointer;color:#20324b}.db-task-sources button span,.db-task-sources button small{display:block;margin-top:8px;line-height:1.7}.db-task-sources button small{color:#7c8da7}.db-task-sources button:hover{border-color:#327aff;background:#f0f5ff}
+
+.db-anniversary{display:flex;gap:12px;padding:17px 18px;margin:14px 0 18px;border:1px solid #f5e0cc;border-radius:12px;background:linear-gradient(120deg,#fff6ed,#fff5f8);color:#9b6536}.db-anniversary>span{font-size:25px;flex-shrink:0}.db-anniversary strong{font-size:14px;color:#a26938}.db-anniversary p{font-size:13px;line-height:1.8;margin:8px 0}.db-anniversary small{font-size:11px;color:#b4967e}

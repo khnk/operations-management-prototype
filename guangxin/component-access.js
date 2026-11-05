@@ -10,7 +10,7 @@ const gradeMap={'普通员工':'B3','主管':'B8','管理层':'B12'};state.user.
 const companyMap={'集团总部':'广新集团总部','子公司 A':'佛塑科技','子公司 B':'星湖科技','子公司 C':'国义招标'};state.user.company=companyMap[state.user.company]||state.user.company;state.rules.forEach(r=>r.conditions.forEach(c=>c.company=(c.company||[]).map(v=>companyMap[v]||v)));
 const groupNames={'全员基础组件':'全体员工','管理层组件':'管理层人员','总部综合管理组件':'总部综合管理人员','示例账号 · 集团门户':'示例账号 · 集团人员组','示例账号 · 业务门户':'示例账号 · 业务人员组'};state.rules.forEach(r=>{if(groupNames[r.name])r.name=groupNames[r.name]});
 // One-time example-account authorization; later administrator changes remain untouched.
-state.user.name??='张嘉嘉';state.user.account??='DEMO-ZJJ';
+state.user.hireDate??='2021-11-05';state.user.name??='张嘉嘉';state.user.account??='DEMO-ZJJ';
 if(!localStorage.getItem('gx-demo-account-portals-v1')){
  let definitions=[];try{definitions=JSON.parse(localStorage.getItem('gx-managed-portals-v1')||'[]')}catch{}
  // Keep existing portal layouts when initializing the shared portal catalogue.
