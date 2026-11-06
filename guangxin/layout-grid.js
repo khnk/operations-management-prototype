@@ -197,7 +197,7 @@
   }
   function moveGhost(x,y){if(!drag||!ghost)return;ghost.style.left=(x-drag.offX)+'px';ghost.style.top=(y-drag.offY)+'px';}
   canvas.addEventListener('dragstart',e=>{const card=e.target.closest('.ld-widget');if(!card||mobile())return;start(e,card,cards().indexOf(card),card.dataset.type);},true);
-  library.addEventListener('dragstart',e=>{const source=e.target.closest('.ld-source');if(source&&!mobile())start(e,source,-1,source.dataset.type);},true);
+  library.addEventListener('dragstart',e=>{const source=e.target.closest('.ld-source');if(source&&source.dataset.placed!=='true'&&!mobile())start(e,source,-1,source.dataset.type);},true);
   function update(x,y){if(!drag)return;const r=canvas.getBoundingClientRect(),m=metrics();drag.lastX=x;drag.lastY=y;moveGhost(x,y);drag.valid=x>=r.left+m.left&&x<r.right&&y>=r.top&&y<=r.bottom;if(!drag.valid){placeholder.style.visibility='hidden';return;}placeholder.style.visibility='visible';drag.target.x=Math.max(0,Math.min(12-drag.target.w,Math.round((x-r.left-m.left-drag.offX)/m.col)));drag.target.y=Math.max(0,Math.round((y-r.top+canvas.scrollTop-m.top-drag.offY)/(ROW+GAP)));positions=settle(drag.base,drag.target,drag.index);cards().forEach((el,i)=>{if(i!==drag.index)place(el,positions[i]);});place(placeholder,drag.target);paintCells(positions);}
   document.addEventListener('dragenter',e=>{if(drag){e.preventDefault();e.dataTransfer.dropEffect=drag.index<0?'copy':'move';}},true);
   document.addEventListener('dragover',e=>{if(!drag)return;e.preventDefault();e.stopImmediatePropagation();e.dataTransfer.dropEffect=drag.index<0?'copy':'move';update(e.clientX,e.clientY);},true);
@@ -211,6 +211,7 @@
     if(mobile()){const el=e.target.closest('#ldCanvas>.ld-widget');if(!el||e.target.closest('.ld-remove'))return;e.preventDefault();e.stopImmediatePropagation();mobilePending={el,id:e.pointerId,x:e.clientX,y:e.clientY,clickTarget:e.target.closest('button,[data-pt-detail],.cw-row,.cw-event')};mobilePending.holdTimer=setTimeout(()=>{if(mobilePending&&!mobileDrag){startMobileMove(e);moveMobile(e)}},180);return;}
     const card=e.target.closest('#ldCanvas>.ld-widget'),source=e.target.closest('#ldLibrary>.ld-source');
     if(card&&e.target.closest('.grid-resize-handle')){startResize(e,card);return;}
+    if(source?.dataset.placed==='true')return;
     if((!card&&!source)||e.target.closest('.ld-remove,.ld-library-close'))return;
     if(!card&&e.target.closest('textarea,input,select,[contenteditable="true"]'))return;
     e.preventDefault();e.stopImmediatePropagation();
